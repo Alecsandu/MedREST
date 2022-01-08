@@ -5,6 +5,7 @@ import com.example.medrest.model.Department;
 import com.example.medrest.repository.DepartmentRepository;
 import com.example.medrest.repository.DoctorRepository;
 import com.example.medrest.repository.LocationRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -17,7 +18,7 @@ public class DepartmentService {
     private final LocationRepository locationRepository;
     private final DoctorRepository doctorRepository;
 
-    public DepartmentService(DepartmentRepository departmentRepository, LocationRepository locationRepository, DoctorRepository doctorRepository) {
+    public DepartmentService(@Autowired DepartmentRepository departmentRepository,@Autowired LocationRepository locationRepository,@Autowired DoctorRepository doctorRepository) {
         this.departmentRepository = departmentRepository;
         this.locationRepository = locationRepository;
         this.doctorRepository = doctorRepository;
