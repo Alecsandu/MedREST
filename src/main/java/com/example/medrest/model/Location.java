@@ -16,7 +16,7 @@ public class Location {
     private String street;
 
     @Column(name = "number")
-    private Integer number;
+    private Integer specialNumber;
 
     //am sters relatia de one to one de aici cu department pentru a nu fi bidirectionala
 
@@ -27,7 +27,15 @@ public class Location {
     public Location(String city, String street, Integer number) {
         this.city = city;
         this.street = street;
-        this.number = number;
+        this.specialNumber = number;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getCity() {
@@ -46,11 +54,25 @@ public class Location {
         this.street = street;
     }
 
-    public Integer getNumber() {
-        return number;
+    public Integer getSpecialNumber() {
+        return specialNumber;
     }
 
-    public void setNumber(Integer number) {
-        this.number = number;
+    public void setSpecialNumber(Integer number) {
+        this.specialNumber = number;
+    }
+
+    public void patch (Location location) {
+        if (location != null) {
+            if (location.getCity() != null) {
+                city = location.getCity();
+            }
+            if (location.getStreet() != null) {
+                street = location.getStreet();
+            }
+            if (location.getSpecialNumber() != null) {
+                specialNumber = location.getSpecialNumber();
+            }
+        }
     }
 }

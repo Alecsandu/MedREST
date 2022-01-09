@@ -1,21 +1,21 @@
 package com.example.medrest.dto;
 
 public class DepartmentDto {
-    private String name;
+    private String depName;
 
     public DepartmentDto() {
         // Every entity has a default constructor declared
     }
 
     public DepartmentDto(String name) {
-        this.name = name;
+        this.depName = name;
     }
 
     public String getName() {
-        return name;
+        return depName;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.depName = name;
     }
 }

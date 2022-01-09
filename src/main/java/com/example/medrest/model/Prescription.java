@@ -24,13 +24,21 @@ public class Prescription {
     private List<Patient> patients;     //patients that have a certain prescription
 
     public Prescription() {
-
+        // Every entity has a default constructor declared
     }
 
     public Prescription(String medicamentName, Integer price, Integer amountToTake) {
         this.medicamentName = medicamentName;
         this.price = price;
         this.amountToTake = amountToTake;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getMedicamentName() {
@@ -49,11 +57,33 @@ public class Prescription {
         this.price = price;
     }
 
-    public int getAmountToTake() {
+    public Integer getAmountToTake() {
         return amountToTake;
     }
 
     public void setAmountToTake(Integer amountToTake) {
         this.amountToTake = amountToTake;
+    }
+
+    public List<Patient> getPatients() {
+        return patients;
+    }
+
+    public void setPatients(List<Patient> patients) {
+        this.patients = patients;
+    }
+
+    public void patch (Prescription prescription) {
+        if (prescription != null) {
+            if (prescription.getMedicamentName() != null) {
+                medicamentName = prescription.getMedicamentName();
+            }
+            if (prescription.getPrice() != null) {
+                price = prescription.getPrice();
+            }
+            if (prescription.getAmountToTake() != null) {
+                amountToTake = prescription.getAmountToTake();
+            }
+        }
     }
 }

@@ -20,7 +20,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 public class DepartmentServiceTest {
-
     @Mock
     private DepartmentRepository departmentRepository;
     @Mock
@@ -36,7 +35,7 @@ public class DepartmentServiceTest {
     }
 
     @Test
-    @DisplayName("Happy path when the department with the given id exists")
+    @DisplayName("Good path when the department with the given id exists")
     void getDepartmentIsPresentTruePath() {
         //arrange
         Department department = new Department();
@@ -52,7 +51,7 @@ public class DepartmentServiceTest {
     }
 
     @Test
-    @DisplayName("Happy path when the department with the given id exists")
+    @DisplayName("Bad path when the department with the given id doesn't exist")
     void getDepartmentIsPresentFalsePath() {
         //arrange
         when(departmentRepository.findById(any()))

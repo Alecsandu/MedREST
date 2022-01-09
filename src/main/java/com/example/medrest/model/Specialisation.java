@@ -27,6 +27,14 @@ public class Specialisation {
         this.maxSalary = maxSalary;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
@@ -49,5 +57,19 @@ public class Specialisation {
 
     public void setMaxSalary(Integer maxSalary) {
         this.maxSalary = maxSalary;
+    }
+
+    public void patch (Specialisation specialisation) {
+        if (specialisation != null) {
+            if (specialisation.getName() != null) {
+                name = specialisation.getName();
+            }
+            if (specialisation.getMinSalary() != null) {
+                minSalary = specialisation.getMinSalary();
+            }
+            if (specialisation.getMaxSalary() != null) {
+                maxSalary = specialisation.getMaxSalary();
+            }
+        }
     }
 }

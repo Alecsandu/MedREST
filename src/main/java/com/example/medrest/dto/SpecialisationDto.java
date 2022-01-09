@@ -16,6 +16,8 @@ public class SpecialisationDto {
         this.maxSalary = maxSalary;
     }
 
+
+
     public String getName() {
         return name;
     }

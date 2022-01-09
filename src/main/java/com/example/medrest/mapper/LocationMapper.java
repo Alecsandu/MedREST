@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LocationMapper {
-    public LocationDto locationToLocationDto(Location location) {
-        return new LocationDto(location.getCity(), location.getStreet(), location.getNumber());
+    public static LocationDto locationToLocationDto(Location location) {
+        return new LocationDto(location.getCity(), location.getStreet(), location.getSpecialNumber());
     }
 }

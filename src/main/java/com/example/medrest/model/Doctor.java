@@ -1,5 +1,6 @@
 package com.example.medrest.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -24,8 +25,8 @@ public class Doctor {
     private List<Patient> patients;
 
     @ManyToOne
-    @JoinColumn(name = "department_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "department_id", referencedColumnName = "id")
+    @JsonManagedReference
     private Department department;
 
     @Column(name = "salary")
@@ -38,6 +39,14 @@ public class Doctor {
     public Doctor(String name, Integer salary) {
         this.name = name;
         this.salary = salary;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -54,5 +63,40 @@ public class Doctor {
 
     public void setSalary(Integer salary) {
         this.salary = salary;
+    }
+
+    public Specialisation getSpecialization() {
+        return specialization;
+    }
+
+    public void setSpecialization(Specialisation specialization) {
+        this.specialization = specialization;
+    }
+
+    public List<Patient> getPatients() {
+        return patients;
+    }
+
+    public void setPatients(List<Patient> patients) {
+        this.patients = patients;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
+
+    public void patch (Doctor doctor) {
+        if (doctor != null) {
+            if (doctor.getName() != null) {
+                name = doctor.getName();
+            }
+            if(doctor.getSalary() != null) {
+                salary = doctor.getSalary();
+            }
+        }
     }
 }

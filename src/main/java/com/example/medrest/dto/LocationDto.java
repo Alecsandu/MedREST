@@ -5,16 +5,16 @@ public class LocationDto {
 
     private String street;
 
-    private Integer number;
+    private Integer specialNumber;
 
     public LocationDto() {
         // Every entity has a default constructor declared
     }
 
-    public LocationDto(String city, String street, Integer number) {
+    public LocationDto(String city, String street, Integer specialNumber) {
         this.city = city;
         this.street = street;
-        this.number = number;
+        this.specialNumber = specialNumber;
     }
 
     public String getCity() {
@@ -33,11 +33,11 @@ public class LocationDto {
         this.street = street;
     }
 
-    public Integer getNumber() {
-        return number;
+    public Integer getSpecialNumber() {
+        return specialNumber;
     }
 
-    public void setNumber(Integer number) {
-        this.number = number;
+    public void setSpecialNumber(Integer specialNumber) {
+        this.specialNumber = specialNumber;
     }
 }
