@@ -60,7 +60,7 @@ public class DepartmentController {
             @ApiResponse(responseCode = "404", description = "Department not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<DepartmentDto> getDepartmentById(@PathVariable Long id) {
+    public ResponseEntity<DepartmentDto> getDepartmentById(@PathVariable("id") Long id) {
         Department department = departmentService.getDepartment(id);
         return ResponseEntity.ok(departmentMapper.departmentToDepartmentDto(department));
     }
