@@ -5,14 +5,14 @@ public class PatientDto {
 
     private String lastName;
 
-    private Integer phoneNumber;
+    private String phoneNumber;
 
     private String emailAddress;
 
     public PatientDto() {
     }
 
-    public PatientDto(String firstName, String lastName, Integer phoneNumber, String emailAddress) {
+    public PatientDto(String firstName, String lastName, String phoneNumber, String emailAddress) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
@@ -35,11 +35,11 @@ public class PatientDto {
         this.lastName = lastName;
     }
 
-    public Integer getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(Integer phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 

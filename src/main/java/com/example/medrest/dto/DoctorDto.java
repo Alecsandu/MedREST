@@ -6,7 +6,7 @@ public class DoctorDto {
     private Integer salary;
 
     public DoctorDto() {
-        // Every entity has a default constructor declared
+        // Every entity needs a default constructor declared
     }
 
     public DoctorDto(String name, Integer salary) {

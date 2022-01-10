@@ -16,18 +16,18 @@ import java.util.Optional;
 @Service
 public class DoctorService {
     public final DoctorRepository doctorRepository;
-    public final PatientRepository patientRepository;
-    public final SpecialisationRepository specialisationRepository;
-    public final DepartmentRepository departmentRepository;
+    public final PatientService patientService;
+    public final SpecialisationService specialisationService;
+    public final DepartmentService departmentService;
 
     public DoctorService(@Autowired DoctorRepository doctorRepository,
-                         @Autowired PatientRepository patientRepository,
-                         @Autowired SpecialisationRepository specialisationRepository,
-                         @Autowired DepartmentRepository departmentRepository) {
+                         @Autowired PatientService patientService,
+                         @Autowired SpecialisationService specialisationService,
+                         @Autowired DepartmentService departmentService) {
         this.doctorRepository = doctorRepository;
-        this.patientRepository = patientRepository;
-        this.specialisationRepository = specialisationRepository;
-        this.departmentRepository = departmentRepository;
+        this.patientService = patientService;
+        this.specialisationService = specialisationService;
+        this.departmentService = departmentService;
     }
 
     public List<Doctor> getAllDoctors() {

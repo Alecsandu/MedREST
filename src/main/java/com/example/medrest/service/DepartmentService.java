@@ -20,13 +20,9 @@ import java.util.stream.StreamSupport;
 @Service
 public class DepartmentService {
     private final DepartmentRepository departmentRepository;
-    private final LocationRepository locationRepository;
-    private final DoctorRepository doctorRepository;
 
-    public DepartmentService(@Autowired DepartmentRepository departmentRepository,@Autowired LocationRepository locationRepository,@Autowired DoctorRepository doctorRepository) {
+    public DepartmentService(@Autowired DepartmentRepository departmentRepository) {
         this.departmentRepository = departmentRepository;
-        this.locationRepository = locationRepository;
-        this.doctorRepository = doctorRepository;
     }
 
     public List<Department> getAllDepartments() {

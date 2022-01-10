@@ -18,7 +18,7 @@ public class Patient {
     private String lastName;
 
     @Column(name = "phone_number" ,nullable = false)
-    private Integer phoneNumber;
+    private String phoneNumber;
 
     @Column(name = "email_address")
     private String emailAddress;
@@ -43,7 +43,7 @@ public class Patient {
         // Every entity has a default constructor declared
     }
 
-    public Patient(String firstName, String lastName, Integer phoneNumber, String emailAddress) {
+    public Patient(String firstName, String lastName, String phoneNumber, String emailAddress) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
@@ -74,11 +74,11 @@ public class Patient {
         this.lastName = lastName;
     }
 
-    public Integer getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(Integer phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
