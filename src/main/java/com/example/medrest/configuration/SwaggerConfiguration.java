@@ -27,7 +27,7 @@ public class SwaggerConfiguration {
     public ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("MedREST API Documentation")
-                .description("API Documentation for all available operations for a private hospytal database")
+                .description("API Documentation for all available operations for a private hospital database.")
                 .build();
     }
 }

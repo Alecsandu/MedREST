@@ -4,12 +4,12 @@ import com.example.medrest.exception.NotFoundException;
 import com.example.medrest.model.Location;
 import com.example.medrest.repository.LocationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+@Service
 public class LocationService {
     public final LocationRepository locationRepository;
 

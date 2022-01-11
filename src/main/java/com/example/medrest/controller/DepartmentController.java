@@ -29,7 +29,7 @@ public class DepartmentController {
     private final DepartmentService departmentService;
     private final DepartmentMapper departmentMapper;
 
-    public DepartmentController(@Autowired DepartmentService departmentService, DepartmentMapper departmentMapper) {
+    public DepartmentController(@Autowired DepartmentService departmentService,@Autowired DepartmentMapper departmentMapper) {
         this.departmentService = departmentService;
         this.departmentMapper = departmentMapper;
     }

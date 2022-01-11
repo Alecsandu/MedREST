@@ -1,6 +1,10 @@
 package com.example.medrest.model;
 
+import com.example.medrest.dto.LocationDto;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 @Entity
 @Table(name = "locations")
@@ -9,6 +13,7 @@ public class Location {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     @Column(name = "city")
     private String city;
 
@@ -74,5 +79,19 @@ public class Location {
                 specialNumber = location.getSpecialNumber();
             }
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Location location = (Location) obj;
+        return  Objects.equals(city, location.city) &&
+                Objects.equals(street, location.street) &&
+                Objects.equals(specialNumber, location.specialNumber);
     }
 }

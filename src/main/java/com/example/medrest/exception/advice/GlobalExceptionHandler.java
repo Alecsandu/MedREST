@@ -1,6 +1,7 @@
 package com.example.medrest.exception.advice;
 
 import com.example.medrest.exception.NotFoundException;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -23,8 +24,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handle(MethodArgumentNotValidException exception) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(exception.getBindingResult().getAllErrors().stream()
-                        .map(error -> error.getDefaultMessage())
+                        .map(DefaultMessageSourceResolvable::getDefaultMessage)
                         .collect(Collectors.joining(", ")));
 
+    }
+
+    @ExceptionHandler({Exception.class})
+    public ResponseEntity<String> handle(RuntimeException exception) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
     }
 }
