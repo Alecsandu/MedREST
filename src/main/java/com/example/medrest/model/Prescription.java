@@ -1,7 +1,9 @@
 package com.example.medrest.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "prescriptions")
@@ -11,12 +13,14 @@ public class Prescription {
     @Column(name = "prescription_id")
     private Long id;
 
+    @NotNull
     @Column(name = "medicament_name", nullable = false)
     private String medicamentName;
 
     @Column(name = "price")
     private Integer price;
 
+    @NotNull
     @Column(name = "amount_to_take", nullable = false)
     private Integer amountToTake;
 
@@ -85,5 +89,20 @@ public class Prescription {
                 amountToTake = prescription.getAmountToTake();
             }
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Prescription prescription = (Prescription) obj;
+        return Objects.equals(id, prescription.getId()) &&
+                Objects.equals(medicamentName, prescription.getMedicamentName()) &&
+                Objects.equals(price, prescription.getPrice()) &&
+                Objects.equals(amountToTake, prescription.getAmountToTake());
     }
 }

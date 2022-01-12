@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PatientMapper {
-    public PatientDto patientToPatientDto(Patient patient) {
+    public static PatientDto patientToPatientDto(Patient patient) {
         return new PatientDto(patient.getFirstName(),
                 patient.getLastName(),
                 patient.getPhoneNumber(),

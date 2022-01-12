@@ -1,11 +1,138 @@
 package com.example.medrest.controller;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.example.medrest.dto.PatientDto;
+import com.example.medrest.mapper.PatientMapper;
+import com.example.medrest.model.Patient;
+import com.example.medrest.service.PatientService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/patients")
 public class PatientController {
+    private final PatientService patientService;
 
+    public PatientController(@Autowired PatientService patientService) {
+        this.patientService = patientService;
+    }
+
+    @Operation(summary = "Get information about all the patients",
+            operationId = "getPatients",
+            description = "This request provides data about each patient entity stored in the database")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "patients were found",
+                    content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            array = @ArraySchema(schema = @Schema(implementation = PatientDto.class)))}
+            ),
+            @ApiResponse(responseCode = "404", description = "No patient entities are stored in the database"),
+            @ApiResponse(responseCode = "500", description = "Something went wrong")
+    })
+    @GetMapping(value = "/infos", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<PatientDto>> getPatients() {
+        List<Patient> patientList = patientService.getAllPatients();
+        return ResponseEntity.ok(patientList
+                .stream()
+                .map(PatientMapper::patientToPatientDto)
+                .collect(Collectors.toList()));
+    }
+
+    @Operation(summary = "Get patient using an id",
+            operationId = "getPatient",
+            description = "By using a valid id you can get the information about its corresponding patient")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "patient found",
+                    content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = PatientDto.class))}),
+            @ApiResponse(responseCode = "404", description = "patient not found"),
+            @ApiResponse(responseCode = "500", description = "Something went wrong")
+    })
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PatientDto> getPatient(@PathVariable("id") Long id) {
+        PatientDto patientDto = PatientMapper.patientToPatientDto(patientService.getPatientById(id));
+        return ResponseEntity.ok(patientDto);
+    }
+
+    @Operation(summary = "Create a new patient",
+            operationId = "createPatient",
+            description = "By providing the basic values for a patient you can create one")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "patient was created",
+                    content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = PatientDto.class))}),
+            @ApiResponse(responseCode = "500", description = "Something went wrong")
+    })
+    @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> createPatient(@RequestBody @Valid Patient newPatient) {
+        Patient toBeSavedPatient = new Patient(newPatient.getFirstName(), newPatient.getLastName(), newPatient.getPhoneNumber(), newPatient.getEmailAddress());
+        Patient savedPatient = patientService.addPatient(toBeSavedPatient);
+        URI uri = URI.create("api/patients/" + savedPatient.getId());
+        return ResponseEntity.created(uri).build();
+    }
+
+    @Operation(summary = "Update a patient",
+            operationId = "changePatient",
+            description = "Change the information about a patient by providing an id and new data")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "patient was updated"),
+            @ApiResponse(responseCode = "404", description = "patient not found"),
+            @ApiResponse(responseCode = "500", description = "Something went wrong")
+    })
+    @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> changePatient(@PathVariable Long id, @RequestBody Patient patient) {
+        Boolean isOperationSuccessful = patientService.updatePatient(id, patient);
+        if (isOperationSuccessful) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Operation(summary = "Patch a patient",
+            operationId = "patchPatient",
+            description = "A part of the information about patient can be changed")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "patient was patched"),
+            @ApiResponse(responseCode = "404", description = "patient not found"),
+            @ApiResponse(responseCode = "500", description = "Something went wrong")
+    })
+    @PatchMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> patchPatient(@PathVariable("id") Long id, @RequestBody Patient patient) {
+        Boolean isOperationSuccessful = patientService.patchPatient(id, patient);
+        if (isOperationSuccessful) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Operation(summary = "Delete a patient entity",
+            operationId = "removePatient",
+            description = "This endpoint removes a patient from the database when an id is provided")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "patient was deleted"),
+            @ApiResponse(responseCode = "404", description = "patient not found"),
+            @ApiResponse(responseCode = "500", description = "Something went wrong")
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> removePatient(@PathVariable("id") Long id) {
+        Boolean isOperationSuccessful = patientService.deletePatient(id);
+        if (isOperationSuccessful) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

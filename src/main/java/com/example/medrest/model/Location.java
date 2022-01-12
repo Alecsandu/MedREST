@@ -1,8 +1,9 @@
 package com.example.medrest.model;
 
-import com.example.medrest.dto.LocationDto;
-
 import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
@@ -14,16 +15,21 @@ public class Location {
     private Long id;
 
     @NotNull
-    @Column(name = "city")
+    @NotBlank
+    @Column(name = "city", nullable = false)
     private String city;
 
-    @Column(name = "street")
+    @NotNull
+    @NotBlank
+    @Column(name = "street", nullable = false)
     private String street;
 
+    @Min(1)
+    @Max(10000)
     @Column(name = "number")
     private Integer specialNumber;
 
-    //am sters relatia de one to one de aici cu department pentru a nu fi bidirectionala
+    // am sters relatia de one to one de aici cu department pentru a nu fi bidirectionala
 
     public Location() {
         // Every entity has a default constructor declared
@@ -90,7 +96,7 @@ public class Location {
         if (getClass() != obj.getClass())
             return false;
         Location location = (Location) obj;
-        return  Objects.equals(city, location.city) &&
+        return Objects.equals(city, location.city) &&
                 Objects.equals(street, location.street) &&
                 Objects.equals(specialNumber, location.specialNumber);
     }

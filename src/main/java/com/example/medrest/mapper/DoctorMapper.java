@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DoctorMapper {
-    public DoctorDto doctorToDoctorDto(Doctor doctor) {
+    public static DoctorDto doctorToDoctorDto(Doctor doctor) {
         return new DoctorDto(doctor.getName(), doctor.getSalary());
     }
 }

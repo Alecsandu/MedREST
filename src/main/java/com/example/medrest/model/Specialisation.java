@@ -1,6 +1,8 @@
 package com.example.medrest.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 @Entity
 @Table(name = "specialisations")
@@ -9,7 +11,8 @@ public class Specialisation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "specialisation_name")
+    @NotNull
+    @Column(name = "specialisation_name", nullable = false)
     private String name;
 
     @Column(name = "min_salary")
@@ -71,5 +74,20 @@ public class Specialisation {
                 maxSalary = specialisation.getMaxSalary();
             }
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Specialisation specialisation = (Specialisation) obj;
+        return Objects.equals(id, specialisation.getId()) &&
+                Objects.equals(name, specialisation.getName()) &&
+                Objects.equals(minSalary, specialisation.getMinSalary()) &&
+                Objects.equals(maxSalary, specialisation.getMaxSalary());
     }
 }

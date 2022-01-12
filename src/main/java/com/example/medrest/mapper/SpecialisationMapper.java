@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SpecialisationMapper {
-    public SpecialisationDto specialisationToSpecialisationDto(Specialisation specialisation) {
+    public static SpecialisationDto specialisationToSpecialisationDto(Specialisation specialisation) {
         return new SpecialisationDto(specialisation.getName(),
                 specialisation.getMinSalary(),
                 specialisation.getMaxSalary());

@@ -1,7 +1,11 @@
 package com.example.medrest.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "patients")
@@ -11,12 +15,15 @@ public class Patient {
     @Column(name = "patient_id")
     private Long id;
 
+    @NotNull
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
+    @NotNull
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
+    @NotNull
     @Column(name = "phone_number" ,nullable = false)
     private String phoneNumber;
 
@@ -29,6 +36,7 @@ public class Patient {
             joinColumns = @JoinColumn(name = "patient_id"),
             inverseJoinColumns = @JoinColumn(name = "doctor_id")
     )
+    @JsonIgnore
     private List<Doctor> doctors;
 
     @ManyToMany
@@ -37,6 +45,7 @@ public class Patient {
             joinColumns = @JoinColumn(name = "patient_id"),
             inverseJoinColumns = @JoinColumn(name = "prescription_id")
     )
+    @JsonIgnore
     private List<Prescription> prescriptions;
 
     public Patient() {
@@ -121,5 +130,21 @@ public class Patient {
                 emailAddress = patient.getEmailAddress();
             }
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Patient patient = (Patient) obj;
+        return Objects.equals(id, patient.getId()) &&
+                Objects.equals(firstName, patient.getFirstName()) &&
+                Objects.equals(lastName, patient.getLastName()) &&
+                Objects.equals(phoneNumber, patient.getPhoneNumber()) &&
+                Objects.equals(emailAddress, patient.getEmailAddress());
     }
 }
