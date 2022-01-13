@@ -24,11 +24,9 @@ import java.util.stream.Collectors;
 @RequestMapping("api/departments")
 public class DepartmentController {
     private final DepartmentService departmentService;
-    private final DepartmentMapper departmentMapper;
 
-    public DepartmentController(@Autowired DepartmentService departmentService,@Autowired DepartmentMapper departmentMapper) {
+    public DepartmentController(@Autowired DepartmentService departmentService) {
         this.departmentService = departmentService;
-        this.departmentMapper = departmentMapper;
     }
 
     @Operation(summary = "Get the names of all the departments",
@@ -43,7 +41,7 @@ public class DepartmentController {
     })
     @GetMapping("/names")
     public ResponseEntity<List<DepartmentDto>> getAllDepartmentNames() {
-        List<DepartmentDto> departmentDtoList = departmentService.getAllDepartments().stream().map(departmentMapper::departmentToDepartmentDto).collect(Collectors.toList());
+        List<DepartmentDto> departmentDtoList = departmentService.getAllDepartments().stream().map(DepartmentMapper::departmentToDepartmentDto).collect(Collectors.toList());
         return ResponseEntity.ok(departmentDtoList);
     }
 
@@ -59,7 +57,7 @@ public class DepartmentController {
     @GetMapping("/{id}")
     public ResponseEntity<DepartmentDto> getDepartmentById(@PathVariable("id") Long id) {
         Department department = departmentService.getDepartment(id);
-        return ResponseEntity.ok(departmentMapper.departmentToDepartmentDto(department));
+        return ResponseEntity.ok(DepartmentMapper.departmentToDepartmentDto(department));
     }
 
     @Operation(summary = "Create a new department",

@@ -1,5 +1,6 @@
 package com.example.medrest.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -25,14 +26,16 @@ public class Doctor {
 
     @ManyToOne
     @JoinColumn(name = "specialization_id")
+    @JsonIgnore
     private Specialisation specialization;
 
     @ManyToMany(mappedBy = "doctors")
+    @JsonIgnore
     private List<Patient> patients;
 
     @ManyToOne
     @JoinColumn(name = "department_id", referencedColumnName = "id")
-    @JsonManagedReference
+    @JsonIgnore
     private Department department;
 
     public Doctor() {

@@ -1,5 +1,7 @@
 package com.example.medrest.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -24,6 +26,7 @@ public class Prescription {
     @Column(name = "amount_to_take", nullable = false)
     private Integer amountToTake;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "prescriptions")
     private List<Patient> patients;     //patients that have a certain prescription
 

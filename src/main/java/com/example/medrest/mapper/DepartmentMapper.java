@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DepartmentMapper {
-    public DepartmentDto departmentToDepartmentDto(Department department) {
+    public static DepartmentDto departmentToDepartmentDto(Department department) {
         return new DepartmentDto(department.getDepartmentName());
     }
 }

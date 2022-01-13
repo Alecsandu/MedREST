@@ -1,6 +1,7 @@
 package com.example.medrest.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -20,10 +21,11 @@ public class Department {
 
     @OneToOne
     @JoinColumn(name = "location_id")
+    @JsonIgnore
     private Location location;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "department")
-    @JsonBackReference
+    @OneToMany(mappedBy = "department")
+    @JsonIgnore
     private List<Doctor> doctors;
 
     public Department() {

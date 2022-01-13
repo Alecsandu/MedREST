@@ -75,7 +75,7 @@ public class DoctorController {
             @ApiResponse(responseCode = "500", description = "Something went wrong")
     })
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> createDoctor(@RequestBody @Valid Doctor newDoctor) {
+    public ResponseEntity<Void> createDoctor(@RequestBody @Valid DoctorDto newDoctor) {
         Doctor toBeSavedDoctor = new Doctor(newDoctor.getName(), newDoctor.getSalary());
         Doctor savedDoctor = doctorService.addDoctor(toBeSavedDoctor);
         URI uri = URI.create("api/doctors/" + savedDoctor.getId());

@@ -1,9 +1,9 @@
 package com.example.medrest.controller;
 
-import com.example.medrest.dto.SpecialisationDto;
+import com.example.medrest.dto.DoctorDto;
 import com.example.medrest.exception.NotFoundException;
-import com.example.medrest.model.Location;
-import com.example.medrest.service.LocationService;
+import com.example.medrest.model.Doctor;
+import com.example.medrest.service.DoctorService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,113 +21,118 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = LocationController.class)
+@WebMvcTest(controllers = DoctorController.class)
 @EnableWebMvc
-public class LocationControllerTest {
+class DoctorControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
 
     @MockBean
-    private LocationService locationService;
+    private DoctorService doctorService;
 
-    private static Location staticLocation;
-    private static List<Location> initialLocationList;
-    private Location testLocation;
+    private static Doctor staticDoctor;
+    private static List<Doctor> initialDoctorList;
+    private Doctor testDoctor;
 
     @BeforeAll
     public static void setupStatic() {
-        staticLocation = new Location("Bucharest","Victoriei", 13);
-        initialLocationList = new ArrayList<>();
-        initialLocationList.add(staticLocation);
+        staticDoctor = new Doctor("Gelu Andrei", 10000);
+        initialDoctorList = new ArrayList<>();
+        initialDoctorList.add(staticDoctor);
     }
 
     @BeforeEach
     public void setupNonStatic() {
-        testLocation = new Location("Ploiesti", "Republicii", 25);
+        testDoctor = new Doctor("Bucur Andrei", 10000);
     }
 
+
     @Test
-    void testGetLocations() throws Exception {
-        String endpoint = "/api/locations/infos";
-        when(locationService.getAllLocations()).thenReturn(initialLocationList);
+    void getDoctors() throws Exception {
+        String endpoint = "/api/doctors/infos";
+        when(doctorService.getAllDoctors()).thenReturn(initialDoctorList);
         mockMvc.perform(get(endpoint)).andExpect(status().isOk());
 
-        when(locationService.getAllLocations()).thenThrow(new NotFoundException("No locations were found!"));
+        when(doctorService.getAllDoctors()).thenThrow(new NotFoundException("No doctors were found!"));
         mockMvc.perform(get(endpoint)).andExpect(status().isNotFound());
     }
 
     @Test
-    void testGetLocation() throws Exception {
-        String endpoint = "/api/locations/{id}";
-        testLocation.setId(1L);
+    void getDoctor() throws Exception {
+        String endpoint = "/api/doctors/{id}";
+        testDoctor.setId(1L);
 
-        when(locationService.getLocationById(anyLong())).thenReturn(testLocation);
+        when(doctorService.getDoctorById(anyLong())).thenReturn(testDoctor);
         mockMvc.perform(get(endpoint, 1L)).andExpect(status().isOk());
 
-        when(locationService.getLocationById(anyLong())).thenThrow(new NotFoundException("No location with the given id was found!"));
+        when(doctorService.getDoctorById(anyLong())).thenThrow(new NotFoundException("No doctor with the given id was found!"));
         mockMvc.perform(get(endpoint, anyLong())).andExpect(status().isNotFound());
     }
 
     @Test
-    void testCreateLocation() throws Exception {
-        String endpoint = "/api/locations";
-        testLocation.setId(1L);
+    void createDoctor() throws Exception {
+        String endpoint = "/api/doctors";
+        testDoctor.setId(1L);
 
-        when(locationService.addLocation(testLocation)).thenReturn(testLocation);
+        DoctorDto doctorDto = new DoctorDto("Bucur Andrei", 10000);
+        Doctor localDoctor = new Doctor("Bucur Andrei", 10000);
+
+        when(doctorService.addDoctor(localDoctor)).thenReturn(testDoctor);
         mockMvc.perform(post(endpoint)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
                         .characterEncoding("UTF-8")
-                        .content(objectMapper.writeValueAsString(testLocation)))
+                        .content(objectMapper.writeValueAsString(doctorDto)))
                 .andExpect(status().isCreated());
     }
 
     @Test
-    void testChangeLocation() throws Exception {
-        String endpoint = "/api/locations/{id}";
-        testLocation.setId(1L);
+    void changeDoctor() throws Exception {
+        String endpoint = "/api/doctors/{id}";
+        testDoctor.setId(1L);
 
-        when(locationService.updateLocation(1L, testLocation)).thenReturn(true);
+        when(doctorService.updateDoctor(1L, testDoctor)).thenReturn(true);
         mockMvc.perform(put(endpoint, 1L)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
                         .characterEncoding("UTF-8")
-                        .content(objectMapper.writeValueAsString(testLocation)))
+                        .content(objectMapper.writeValueAsString(testDoctor)))
                 .andExpect(status().isNoContent());
 
-        when(locationService.updateLocation(1L, testLocation)).thenReturn(false);
+        when(doctorService.updateDoctor(1L, testDoctor)).thenReturn(false);
         mockMvc.perform(put(endpoint, 1L)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
                         .characterEncoding("UTF-8")
-                        .content(objectMapper.writeValueAsString(testLocation)))
+                        .content(objectMapper.writeValueAsString(testDoctor)))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    void testPatchLocation() throws Exception {
-        String endpoint = "/api/locations/{id}";
-        testLocation.setId(1L);
+    void patchDoctor() throws Exception {
+        String endpoint = "/api/doctors/{id}";
+        testDoctor.setId(1L);
 
-        when(locationService.patchLocation(1L, testLocation)).thenReturn(true);
+        when(doctorService.patchDoctor(1L, testDoctor)).thenReturn(true);
         mockMvc.perform(patch(endpoint, 1L)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
                         .characterEncoding("UTF-8")
-                        .content(objectMapper.writeValueAsString(testLocation)))
+                        .content(objectMapper.writeValueAsString(testDoctor)))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    void testRemoveLocation() throws Exception {
-        String endpoint = "/api/locations/{id}";
-        testLocation.setId(1L);
+    void removeDoctor() throws Exception {
+        String endpoint = "/api/doctors/{id}";
+        testDoctor.setId(1L);
 
-        when(locationService.deleteLocation(1L)).thenReturn(true);
+        when(doctorService.deleteDoctor(1L)).thenReturn(true);
         mockMvc.perform(delete(endpoint, 1L)).andExpect(status().isNoContent());
     }
 }

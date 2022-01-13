@@ -75,7 +75,7 @@ public class PrescriptionController {
             @ApiResponse(responseCode = "500", description = "Something went wrong")
     })
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> createPrescription(@RequestBody @Valid Prescription newPrescription) {
+    public ResponseEntity<Void> createPrescription(@RequestBody @Valid PrescriptionDto newPrescription) {
         Prescription toBeSavedPrescription = new Prescription(newPrescription.getMedicamentName(), newPrescription.getPrice(), newPrescription.getAmountToTake());
         Prescription savedPrescription = prescriptionService.addPrescription(toBeSavedPrescription);
         URI uri = URI.create("api/prescriptions/" + savedPrescription.getId());

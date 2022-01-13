@@ -75,7 +75,7 @@ public class SpecialisationController {
             @ApiResponse(responseCode = "500", description = "Something went wrong")
     })
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> createSpecialisation(@RequestBody @Valid Specialisation newSpecialisation) {
+    public ResponseEntity<Void> createSpecialisation(@RequestBody @Valid SpecialisationDto newSpecialisation) {
         Specialisation toBeSavedSpecialisation = new Specialisation(newSpecialisation.getName(), newSpecialisation.getMinSalary(), newSpecialisation.getMaxSalary());
         Specialisation savedSpecialisation = specialisationService.addSpecialisation(toBeSavedSpecialisation);
         URI uri = URI.create("api/specialisations/" + savedSpecialisation.getId());
