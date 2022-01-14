@@ -23,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -252,7 +253,7 @@ public class PatientController {
     @GetMapping(path = "/{id}/appointments", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<DoctorDto>> getPatientAppointmentsWithDoctors(@PathVariable("id") Long patientId) {
         Patient existingPatient = patientService.getPatientById(patientId);
-        if (existingPatient.getPrescriptions().isEmpty()) {
+        if (existingPatient.getDoctors().isEmpty()) {
             return ResponseEntity.noContent().build();
         } else {
             List<DoctorDto> doctorDtoList = existingPatient.getDoctors().stream().map(DoctorMapper::doctorToDoctorDto).collect(Collectors.toList());
@@ -268,13 +269,16 @@ public class PatientController {
             @ApiResponse(responseCode = "404", description = "Given patient or appointment not found"),
             @ApiResponse(responseCode = "500", description = "Something went wrong")
     })
+    @Transactional
     @DeleteMapping(path = "/{patientId}/doctors/{doctorId}")
     public ResponseEntity<Void> removePatientAppointment(@PathVariable("patientId") Long patientId,
                                                           @PathVariable("doctorId") Long doctorId) {
         Patient patient = patientService.getPatientById(patientId);
         Doctor doctor = doctorService.getDoctorById(doctorId);
         patient.removeDoctor(doctor);
+        doctor.removePatient(patient);
         Boolean result = patientService.updatePatient(patientId, patient);
+        Boolean res = doctorService.updateDoctor(doctorId, doctor);
         if (result) {
             return ResponseEntity.noContent().build();
         } else {
