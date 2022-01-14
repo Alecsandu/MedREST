@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,6 +41,7 @@ public class Prescription {
         this.medicamentName = medicamentName;
         this.price = price;
         this.amountToTake = amountToTake;
+        patients = new ArrayList<>();
     }
 
     public Long getId() {

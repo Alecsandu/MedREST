@@ -211,7 +211,9 @@ public class PatientController {
         Patient patient = patientService.getPatientById(patientId);
         Prescription prescription = prescriptionService.getPrescriptionById(prescriptionId);
         patient.removePrescriptions(prescription);
+        prescription.removePatient(patient);
         Patient samePatient = patientService.addPatient(patient);
+        Prescription samePrescription = prescriptionService.addPrescription(prescription);
         return ResponseEntity.noContent().build();
     }
 

@@ -1,10 +1,7 @@
 package com.example.medrest.controller;
 
-import com.example.medrest.dto.DepartmentDto;
 import com.example.medrest.dto.PatientDto;
-import com.example.medrest.exception.DepartmentNotFoundException;
 import com.example.medrest.exception.NotFoundException;
-import com.example.medrest.model.Department;
 import com.example.medrest.model.Doctor;
 import com.example.medrest.model.Patient;
 import com.example.medrest.model.Prescription;
@@ -28,7 +25,6 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = PatientController.class)
@@ -191,10 +187,12 @@ class PatientControllerTest {
                 1);
         prescription.setId(1L);
         testPatient.addPrescriptions(prescription);
+        prescription.addPatients(testPatient);
 
         when(patientService.getPatientById(1L)).thenReturn(testPatient);
         when(prescriptionService.getPrescriptionById(1L)).thenReturn(prescription);
         when(patientService.addPatient(testPatient)).thenReturn(testPatient);
+        when(prescriptionService.addPrescription(prescription)).thenReturn(prescription);
         mockMvc.perform(delete(endpoint, 1L, 1L)).andExpect(status().isNoContent());
     }
 
