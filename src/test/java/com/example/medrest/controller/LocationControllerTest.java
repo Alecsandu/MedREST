@@ -43,7 +43,9 @@ public class LocationControllerTest {
 
     @BeforeAll
     public static void setupStatic() {
-        staticLocation = new Location("Bucharest","Victoriei", 13);
+        staticLocation = new Location("Bucharest",
+                "Victoriei",
+                13);
         initialLocationList = new ArrayList<>();
         initialLocationList.add(staticLocation);
     }

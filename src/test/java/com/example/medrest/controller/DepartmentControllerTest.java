@@ -145,6 +145,23 @@ class DepartmentControllerTest {
     }
 
     @Test
-    void setDepartmentLocation() {
+    void setDepartmentLocation() throws Exception {
+        String endpoint = "/api/departments/{depId}/location/{locId}";
+        testDepartment.setId(1L);
+
+        Location location = new Location("Bucharest",
+                "Victoriei",
+                13);
+        location.setId(1L);
+
+        when(departmentLocationService.getLocationById(1L)).thenReturn(location);
+        when(departmentService.getDepartment(1L)).thenReturn(testDepartment);
+        when(departmentService.patchDepartment(1L, testDepartment)).thenReturn(true);
+        mockMvc.perform(patch(endpoint, 1L, 1L)).andExpect(status().isNoContent());
+
+        when(departmentLocationService.getLocationById(1L)).thenReturn(location);
+        when(departmentService.getDepartment(1L)).thenReturn(testDepartment);
+        when(departmentService.patchDepartment(1L, testDepartment)).thenReturn(false);
+        mockMvc.perform(patch(endpoint, 1L, 1L)).andExpect(status().isNotFound());
     }
 }
