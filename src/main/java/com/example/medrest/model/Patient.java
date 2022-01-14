@@ -1,11 +1,13 @@
 package com.example.medrest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 @Table(name = "patients")
@@ -16,37 +18,41 @@ public class Patient {
     private Long id;
 
     @NotNull
+    @NotBlank
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
     @NotNull
+    @NotBlank
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
     @NotNull
+    @NotBlank
     @Column(name = "phone_number" ,nullable = false)
     private String phoneNumber;
 
+    @NotBlank
     @Column(name = "email_address")
     private String emailAddress;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "patients_doctors",
             joinColumns = @JoinColumn(name = "patient_id"),
             inverseJoinColumns = @JoinColumn(name = "doctor_id")
     )
     @JsonIgnore
-    private List<Doctor> doctors;
+    private Set<Doctor> doctors;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "patients_prescriptions",
             joinColumns = @JoinColumn(name = "patient_id"),
             inverseJoinColumns = @JoinColumn(name = "prescription_id")
     )
     @JsonIgnore
-    private List<Prescription> prescriptions;
+    private Set<Prescription> prescriptions;
 
     public Patient() {
         // Every entity has a default constructor declared
@@ -57,6 +63,8 @@ public class Patient {
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
         this.emailAddress = emailAddress;
+        prescriptions = new HashSet<>();
+        doctors = new HashSet<>();
     }
 
     public Long getId() {
@@ -99,20 +107,36 @@ public class Patient {
         this.emailAddress = emailAddress;
     }
 
-    public List<Doctor> getDoctors() {
+    public Set<Doctor> getDoctors() {
         return doctors;
     }
 
-    public void setDoctors(List<Doctor> doctors) {
+    public void setDoctors(Set<Doctor> doctors) {
         this.doctors = doctors;
     }
 
-    public List<Prescription> getPrescriptions() {
+    public Set<Prescription> getPrescriptions() {
         return prescriptions;
     }
 
-    public void setPrescriptions(List<Prescription> prescriptions) {
+    public void setPrescriptions(Set<Prescription> prescriptions) {
         this.prescriptions = prescriptions;
+    }
+
+    public void addPrescriptions(Prescription prescription) {
+        prescriptions.add(prescription);
+    }
+
+    public void removePrescriptions(Prescription prescription) {
+        prescriptions.remove(prescription);
+    }
+
+    public void addDoctor(Doctor doctor) {
+        doctors.add(doctor);
+    }
+
+    public void removeDoctor(Doctor doctor) {
+        doctors.remove(doctor);
     }
 
     public void patch (Patient patient) {
@@ -128,6 +152,12 @@ public class Patient {
             }
             if (patient.getEmailAddress() != null) {
                 emailAddress = patient.getEmailAddress();
+            }
+            if (patient.getPrescriptions() != null && !patient.getPrescriptions().isEmpty()) {
+                prescriptions = patient.getPrescriptions();
+            }
+            if (patient.getDoctors() != null && !patient.getDoctors().isEmpty()) {
+                doctors = patient.getDoctors();
             }
         }
     }

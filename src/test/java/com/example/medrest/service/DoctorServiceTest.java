@@ -106,4 +106,22 @@ public class DoctorServiceTest {
         assertNotNull(result);
         assertFalse(result);
     }
+
+    @Test
+    void testCheckIfAnyDoctorIsAssignedToGivenDepartmentGoodPath() {
+        when(doctorRepository.findAll()).thenReturn(new ArrayList<Doctor>());
+        Boolean result = doctorService.checkIfAnyDoctorIsAssignedToGivenDepartment(1L);
+
+        assertNotNull(result);
+        assertTrue(result);
+    }
+
+    @Test
+    void checkIfAnyDoctorHasSetGivenSpecialisation() {
+        when(doctorRepository.findAll()).thenReturn(new ArrayList<Doctor>());
+        Boolean result = doctorService.checkIfAnyDoctorHasSetGivenSpecialisation(1L);
+
+        assertNotNull(result);
+        assertTrue(result);
+    }
 }

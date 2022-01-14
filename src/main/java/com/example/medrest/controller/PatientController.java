@@ -1,9 +1,17 @@
 package com.example.medrest.controller;
 
+import com.example.medrest.dto.DoctorDto;
 import com.example.medrest.dto.PatientDto;
+import com.example.medrest.dto.PrescriptionDto;
+import com.example.medrest.mapper.DoctorMapper;
 import com.example.medrest.mapper.PatientMapper;
+import com.example.medrest.mapper.PrescriptionMapper;
+import com.example.medrest.model.Doctor;
 import com.example.medrest.model.Patient;
+import com.example.medrest.model.Prescription;
+import com.example.medrest.service.DoctorService;
 import com.example.medrest.service.PatientService;
+import com.example.medrest.service.PrescriptionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,9 +32,15 @@ import java.util.stream.Collectors;
 @RequestMapping("api/patients")
 public class PatientController {
     private final PatientService patientService;
+    private final PrescriptionService prescriptionService;
+    private final DoctorService doctorService;
 
-    public PatientController(@Autowired PatientService patientService) {
+    public PatientController(@Autowired PatientService patientService,
+                             @Autowired PrescriptionService prescriptionService,
+                             @Autowired DoctorService doctorService) {
         this.patientService = patientService;
+        this.prescriptionService = prescriptionService;
+        this.doctorService = doctorService;
     }
 
     @Operation(summary = "Get information about all the patients",
@@ -75,7 +89,7 @@ public class PatientController {
             @ApiResponse(responseCode = "500", description = "Something went wrong")
     })
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> createPatient(@RequestBody @Valid Patient newPatient) {
+    public ResponseEntity<Void> createPatient(@RequestBody @Valid PatientDto newPatient) {
         Patient toBeSavedPatient = new Patient(newPatient.getFirstName(), newPatient.getLastName(), newPatient.getPhoneNumber(), newPatient.getEmailAddress());
         Patient savedPatient = patientService.addPatient(toBeSavedPatient);
         URI uri = URI.create("api/patients/" + savedPatient.getId());
@@ -130,6 +144,138 @@ public class PatientController {
     public ResponseEntity<Void> removePatient(@PathVariable("id") Long id) {
         Boolean isOperationSuccessful = patientService.deletePatient(id);
         if (isOperationSuccessful) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Operation(summary = "add prescriptions to a patient",
+            operationId = "addPrescriptionToPatient",
+            description = "Firstly give the id of the patient entity which you want to modify and" +
+                    " secondly the id of the prescription that you want add give to the patient")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "prescription was assigned to the patient"),
+            @ApiResponse(responseCode = "404", description = "patient or prescription not found"),
+            @ApiResponse(responseCode = "500", description = "Something went wrong")
+    })
+    @PostMapping(path = "/{patientId}/prescriptions/{prescriptionId}")
+    public ResponseEntity<Void> addPrescriptionToPatient(@PathVariable("patientId") Long patientId,
+                                                         @PathVariable("prescriptionId") Long prescriptionId) {
+        Patient existingPatient = patientService.getPatientById(patientId);
+        Prescription existingPrescription = prescriptionService.getPrescriptionById(prescriptionId);
+        existingPatient.addPrescriptions(existingPrescription);
+        Boolean isOperationSuccessful = patientService.updatePatient(patientId, existingPatient);
+        if (isOperationSuccessful) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Operation(summary = "Get the prescriptions that are given to the patient with given id",
+            operationId = "getPrescriptionPatients",
+            description = "By using a valid id you can get the information about its corresponding prescription")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "prescription's patients found",
+                    content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            array = @ArraySchema(schema = @Schema(implementation = PatientDto.class)))}
+            ),
+            @ApiResponse(responseCode = "204", description = "patient has no prescriptions"),
+            @ApiResponse(responseCode = "404", description = "patient not found"),
+            @ApiResponse(responseCode = "500", description = "Something went wrong")
+    })
+    @GetMapping(path = "/{id}/patients", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<PrescriptionDto>> getPatientPrescriptions(@PathVariable("id") Long patientId) {
+        Patient existingPatient = patientService.getPatientById(patientId);
+        if (existingPatient.getPrescriptions().isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            List<PrescriptionDto> patientDtoList = existingPatient.getPrescriptions().stream().map(PrescriptionMapper::prescriptionToPrescriptionDto).collect(Collectors.toList());
+            return ResponseEntity.ok(patientDtoList);
+        }
+    }
+
+    @Operation(summary = "Remove a prescription from a patient",
+            operationId = "removePatientPrescription",
+            description = "This endpoint removes a prescription from a patient")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "prescription was removed from patient"),
+            @ApiResponse(responseCode = "404", description = "given patient or prescription not found"),
+            @ApiResponse(responseCode = "500", description = "Something went wrong")
+    })
+    @DeleteMapping(path = "/{patientId}/prescriptions/{prescriptionId}")
+    public ResponseEntity<Void> removePatientPrescription(@PathVariable("patientId") Long patientId,
+                                                          @PathVariable("prescriptionId") Long prescriptionId) {
+        Patient patient = patientService.getPatientById(patientId);
+        Prescription prescription = prescriptionService.getPrescriptionById(prescriptionId);
+        patient.removePrescriptions(prescription);
+        Patient samePatient = patientService.addPatient(patient);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "appoint a patient to a doctor",
+            operationId = "appointPatientToDoctor",
+            description = "Firstly give the id of the patient entity which you want to modify and" +
+                    " secondly the id of the prescription that you want add give to the patient")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "patient was assigned to the doctor"),
+            @ApiResponse(responseCode = "404", description = "patient or doctor not found"),
+            @ApiResponse(responseCode = "500", description = "Something went wrong")
+    })
+    @PostMapping(path = "/{patientId}/doctors/{doctorId}")
+    public ResponseEntity<Void> appointPatientToDoctor(@PathVariable("patientId") Long patientId,
+                                                         @PathVariable("doctorId") Long doctorId) {
+        Patient existingPatient = patientService.getPatientById(patientId);
+        Doctor existingDoctor = doctorService.getDoctorById(doctorId);
+        existingPatient.addDoctor(existingDoctor);
+        Boolean isOperationSuccessful = patientService.patchPatient(patientId, existingPatient);
+        if (isOperationSuccessful) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Operation(summary = "Get the doctors that the patient has appointments with",
+            operationId = "getPatientAppointmentsWithDoctors",
+            description = "By using a valid patient id you can get the information about its corresponding doctors")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "patient appointments found",
+                    content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            array = @ArraySchema(schema = @Schema(implementation = DoctorDto.class)))}
+            ),
+            @ApiResponse(responseCode = "204", description = "patient has no doctor appointments"),
+            @ApiResponse(responseCode = "404", description = "patient not found"),
+            @ApiResponse(responseCode = "500", description = "Something went wrong")
+    })
+    @GetMapping(path = "/{id}/appointments", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<DoctorDto>> getPatientAppointmentsWithDoctors(@PathVariable("id") Long patientId) {
+        Patient existingPatient = patientService.getPatientById(patientId);
+        if (existingPatient.getPrescriptions().isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            List<DoctorDto> doctorDtoList = existingPatient.getDoctors().stream().map(DoctorMapper::doctorToDoctorDto).collect(Collectors.toList());
+            return ResponseEntity.ok(doctorDtoList);
+        }
+    }
+
+    @Operation(summary = "Remove a doctor appointment from a patient",
+            operationId = "removePatientAppointment",
+            description = "This endpoint removes a doctor appointment from a patient")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Doctor appointment was removed from patient"),
+            @ApiResponse(responseCode = "404", description = "Given patient or appointment not found"),
+            @ApiResponse(responseCode = "500", description = "Something went wrong")
+    })
+    @DeleteMapping(path = "/{patientId}/doctors/{doctorId}")
+    public ResponseEntity<Void> removePatientAppointment(@PathVariable("patientId") Long patientId,
+                                                          @PathVariable("doctorId") Long doctorId) {
+        Patient patient = patientService.getPatientById(patientId);
+        Doctor doctor = doctorService.getDoctorById(doctorId);
+        patient.removeDoctor(doctor);
+        Boolean result = patientService.updatePatient(patientId, patient);
+        if (result) {
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();

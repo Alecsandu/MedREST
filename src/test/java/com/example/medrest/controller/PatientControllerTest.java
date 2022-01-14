@@ -5,8 +5,12 @@ import com.example.medrest.dto.PatientDto;
 import com.example.medrest.exception.DepartmentNotFoundException;
 import com.example.medrest.exception.NotFoundException;
 import com.example.medrest.model.Department;
+import com.example.medrest.model.Doctor;
 import com.example.medrest.model.Patient;
+import com.example.medrest.model.Prescription;
+import com.example.medrest.service.DoctorService;
 import com.example.medrest.service.PatientService;
+import com.example.medrest.service.PrescriptionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +41,10 @@ class PatientControllerTest {
 
     @MockBean
     private PatientService patientService;
+    @MockBean
+    private PrescriptionService prescriptionService;
+    @MockBean
+    private DoctorService doctorService;
 
     private static Patient staticPatient;
     private static List<Patient> initialPatientList;
@@ -148,5 +156,80 @@ class PatientControllerTest {
 
         when(patientService.deletePatient(1L)).thenReturn(true);
         mockMvc.perform(delete(endpoint, 1L)).andExpect(status().isNoContent());
+    }
+
+    @Test
+    void addPrescriptionToPatient() throws Exception {
+        String endpoint = "/api/patients/{patientId}/prescriptions/{prescriptionId}";
+        testPatient.setId(1L);
+        Prescription prescription = new Prescription("Augmentin",
+                35,
+                1);
+        prescription.setId(1L);
+
+        when(patientService.getPatientById(1L)).thenReturn(testPatient);
+        when(prescriptionService.getPrescriptionById(1L)).thenReturn(prescription);
+        when(patientService.updatePatient(1L, testPatient)).thenReturn(true);
+        mockMvc.perform(post(endpoint, 1L, 1L)).andExpect(status().isNoContent());
+    }
+
+    @Test
+    void getPatientPrescriptions() throws Exception {
+        String endpoint = "/api/patients/{id}/patients";
+        testPatient.setId(1L);
+
+        when(patientService.getPatientById(1L)).thenReturn(testPatient);
+        mockMvc.perform(get(endpoint, 1L)).andExpect(status().isNoContent());
+    }
+
+    @Test
+    void removePatientPrescription() throws Exception {
+        String endpoint = "/api/patients/{patientId}/prescriptions/{prescriptionId}";
+        testPatient.setId(1L);
+        Prescription prescription = new Prescription("Augmentin",
+                35,
+                1);
+        prescription.setId(1L);
+        testPatient.addPrescriptions(prescription);
+
+        when(patientService.getPatientById(1L)).thenReturn(testPatient);
+        when(prescriptionService.getPrescriptionById(1L)).thenReturn(prescription);
+        when(patientService.addPatient(testPatient)).thenReturn(testPatient);
+        mockMvc.perform(delete(endpoint, 1L, 1L)).andExpect(status().isNoContent());
+    }
+
+    @Test
+    void appointPatientToDoctor() throws Exception{
+        String endpoint = "/api/patients/{patientId}/doctors/{doctorId}";
+        testPatient.setId(1L);
+        Doctor doctor = new Doctor("Gelu Andrei", 10000);
+        doctor.setId(1L);
+
+        when(patientService.getPatientById(1L)).thenReturn(testPatient);
+        when(doctorService.getDoctorById(1L)).thenReturn(doctor);
+        when(patientService.patchPatient(1L, testPatient)).thenReturn(true);
+        mockMvc.perform(post(endpoint,1L, 1L)).andExpect(status().isNoContent());
+    }
+
+    @Test
+    void getPatientAppointmentsWithDoctors() throws Exception{
+        String endpoint = "/api/patients/{id}/appointments";
+        testPatient.setId(1L);
+
+        when(patientService.getPatientById(1L)).thenReturn(testPatient);
+        mockMvc.perform(get(endpoint, 1L)).andExpect(status().isNoContent());
+    }
+
+    @Test
+    void removePatientAppointment() throws Exception{
+        String endpoint = "/api/patients/{patientId}/doctors/{doctorId}";
+        testPatient.setId(1L);
+        Doctor doctor = new Doctor("Gelu Andrei", 10000);
+        doctor.setId(1L);
+
+        when(patientService.getPatientById(1L)).thenReturn(testPatient);
+        when(doctorService.getDoctorById(1L)).thenReturn(doctor);
+        when(patientService.updatePatient(1L, testPatient)).thenReturn(true);
+        mockMvc.perform(delete(endpoint, 1L,1L)).andExpect(status().isNoContent());
     }
 }

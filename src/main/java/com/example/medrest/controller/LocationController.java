@@ -1,8 +1,10 @@
 package com.example.medrest.controller;
 
 import com.example.medrest.dto.LocationDto;
+import com.example.medrest.exception.CanNotDeleteException;
 import com.example.medrest.mapper.LocationMapper;
 import com.example.medrest.model.Location;
+import com.example.medrest.service.DepartmentService;
 import com.example.medrest.service.LocationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -24,9 +26,12 @@ import java.util.stream.Collectors;
 @RequestMapping("api/locations")
 public class LocationController {
     private final LocationService locationService;
+    private final DepartmentService departmentService;
 
-    public LocationController(@Autowired LocationService locationService) {
+    public LocationController(@Autowired LocationService locationService,
+                              @Autowired DepartmentService departmentService) {
         this.locationService = locationService;
+        this.departmentService = departmentService;
     }
 
     @Operation(summary = "Get information about all the locations",
@@ -75,7 +80,7 @@ public class LocationController {
             @ApiResponse(responseCode = "500", description = "Something went wrong")
     })
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> createLocation(@RequestBody @Valid Location newLocation) {
+    public ResponseEntity<Void> createLocation(@RequestBody @Valid LocationDto newLocation) {
         Location toBeSavedLocation = new Location(newLocation.getCity(), newLocation.getStreet(), newLocation.getSpecialNumber());
         Location savedLocation = locationService.addLocation(toBeSavedLocation);
         URI uri = URI.create("api/locations/" + savedLocation.getId());
@@ -124,10 +129,15 @@ public class LocationController {
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Location was deleted"),
             @ApiResponse(responseCode = "404", description = "Location not found"),
+            @ApiResponse(responseCode = "409", description = "The location can no be deleted because it has departments set to it"),
             @ApiResponse(responseCode = "500", description = "Something went wrong")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> removeLocation(@PathVariable("id") Long id) {
+        Boolean canBeRemoved = departmentService.checkIfAnyDepartmentHasGivenLocation(id);
+        if (!canBeRemoved) {
+            throw new CanNotDeleteException("The location can no be deleted because it has departments set to it");
+        }
         Boolean isOperationSuccessful = locationService.deleteLocation(id);
         if (isOperationSuccessful) {
             return ResponseEntity.noContent().build();

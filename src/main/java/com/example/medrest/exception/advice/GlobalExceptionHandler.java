@@ -1,5 +1,6 @@
 package com.example.medrest.exception.advice;
 
+import com.example.medrest.exception.CanNotDeleteException;
 import com.example.medrest.exception.NotFoundException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -15,9 +16,14 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
     @ExceptionHandler({NotFoundException.class})
     public ResponseEntity<String> handle(NotFoundException exception) {
-
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(exception.getMessage() + " at " + LocalDateTime.now());
+    }
+
+    @ExceptionHandler({CanNotDeleteException.class})
+    public ResponseEntity<String> handle(CanNotDeleteException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(exception.getMessage());
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class})

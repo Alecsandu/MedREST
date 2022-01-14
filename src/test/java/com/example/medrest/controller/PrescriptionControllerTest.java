@@ -7,6 +7,8 @@ import com.example.medrest.exception.NotFoundException;
 import com.example.medrest.model.Doctor;
 import com.example.medrest.model.Prescription;
 import com.example.medrest.model.Specialisation;
+import com.example.medrest.service.DoctorService;
+import com.example.medrest.service.PatientService;
 import com.example.medrest.service.PrescriptionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
@@ -38,6 +40,8 @@ class PrescriptionControllerTest {
 
     @MockBean
     private PrescriptionService prescriptionService;
+    @MockBean
+    private PatientService patientService;
 
     private static Prescription staticPrescription;
     private static List<Prescription> initialPrescriptionList;

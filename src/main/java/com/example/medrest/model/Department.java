@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
@@ -16,6 +17,7 @@ public class Department {
     private Long id;
 
     @NotNull
+    @NotBlank
     @Column(name = "department_name", nullable = false)
     private String departmentName;
 
@@ -72,6 +74,9 @@ public class Department {
         if (department != null) {
             if (department.getDepartmentName() != null) {
                 departmentName = department.getDepartmentName();
+            }
+            if (department.getLocation() != null) {
+                location = department.getLocation();
             }
         }
     }

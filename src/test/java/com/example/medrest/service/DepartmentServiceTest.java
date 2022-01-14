@@ -2,6 +2,7 @@ package com.example.medrest.service;
 
 import com.example.medrest.exception.NotFoundException;
 import com.example.medrest.model.Department;
+import com.example.medrest.model.Doctor;
 import com.example.medrest.repository.DepartmentRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -135,5 +136,14 @@ public class DepartmentServiceTest {
 
         assertNotNull(result);
         assertFalse(result);
+    }
+
+    @Test
+    void checkIfAnyDepartmentHasGivenLocation() {
+        when(departmentRepository.findAll()).thenReturn(new ArrayList<Department>());
+        Boolean result = departmentService.checkIfAnyDepartmentHasGivenLocation(1L);
+
+        assertNotNull(result);
+        assertTrue(result);
     }
 }

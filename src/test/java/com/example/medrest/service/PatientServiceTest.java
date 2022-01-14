@@ -26,6 +26,7 @@ class PatientServiceTest {
     @InjectMocks
     private PatientService patientService;
 
+
     @Test
     @DisplayName("Good path when we have data in the database about patients")
     void getAllPatientsIsPresentFlow() {

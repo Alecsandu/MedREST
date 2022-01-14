@@ -2,15 +2,12 @@ package com.example.medrest.service;
 
 import com.example.medrest.exception.NotFoundException;
 import com.example.medrest.model.Doctor;
-import com.example.medrest.model.Location;
-import com.example.medrest.repository.DepartmentRepository;
 import com.example.medrest.repository.DoctorRepository;
-import com.example.medrest.repository.PatientRepository;
-import com.example.medrest.repository.SpecialisationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -86,5 +83,25 @@ public class DoctorService {
         } else {
             return false;
         }
+    }
+
+    public Boolean checkIfAnyDoctorIsAssignedToGivenDepartment(Long id) {
+        List<Doctor> existingDoctors = (List<Doctor>)doctorRepository.findAll();
+        for(Doctor doctor:existingDoctors) {
+            if (Objects.equals(doctor.getDepartment().getId(), id)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public Boolean checkIfAnyDoctorHasSetGivenSpecialisation(Long id) {
+        List<Doctor> existingDoctors = (List<Doctor>)doctorRepository.findAll();
+        for(Doctor doctor:existingDoctors) {
+            if (Objects.equals(doctor.getSpecialization().getId(), id)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

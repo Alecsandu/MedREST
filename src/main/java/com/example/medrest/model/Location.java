@@ -29,8 +29,6 @@ public class Location {
     @Column(name = "number")
     private Integer specialNumber;
 
-    // am sters relatia de one to one de aici cu department pentru a nu fi bidirectionala
-
     public Location() {
         // Every entity has a default constructor declared
     }

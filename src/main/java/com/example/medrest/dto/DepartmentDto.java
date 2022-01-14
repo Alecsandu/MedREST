@@ -1,6 +1,11 @@
 package com.example.medrest.dto;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 public class DepartmentDto {
+    @NotNull
+    @NotBlank
     private String depName;
 
     public DepartmentDto() {

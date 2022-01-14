@@ -1,8 +1,12 @@
 package com.example.medrest.controller;
 
+import com.example.medrest.dto.PatientDto;
 import com.example.medrest.dto.PrescriptionDto;
+import com.example.medrest.mapper.PatientMapper;
 import com.example.medrest.mapper.PrescriptionMapper;
+import com.example.medrest.model.Patient;
 import com.example.medrest.model.Prescription;
+import com.example.medrest.service.PatientService;
 import com.example.medrest.service.PrescriptionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -24,9 +28,12 @@ import java.util.stream.Collectors;
 @RequestMapping("api/prescriptions")
 public class PrescriptionController {
     private final PrescriptionService prescriptionService;
+    private final PatientService patientService;
 
-    public PrescriptionController(@Autowired PrescriptionService prescriptionService) {
+    public PrescriptionController(@Autowired PrescriptionService prescriptionService,
+                                  @Autowired PatientService patientService) {
         this.prescriptionService = prescriptionService;
+        this.patientService = patientService;
     }
 
     @Operation(summary = "Get information about all the prescriptions",

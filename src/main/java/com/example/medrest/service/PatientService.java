@@ -2,6 +2,7 @@ package com.example.medrest.service;
 
 import com.example.medrest.exception.NotFoundException;
 import com.example.medrest.model.Patient;
+import com.example.medrest.model.Prescription;
 import com.example.medrest.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

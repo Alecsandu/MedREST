@@ -2,8 +2,14 @@ package com.example.medrest.controller;
 
 import com.example.medrest.dto.DoctorDto;
 import com.example.medrest.mapper.DoctorMapper;
+import com.example.medrest.model.Department;
 import com.example.medrest.model.Doctor;
+import com.example.medrest.model.Location;
+import com.example.medrest.model.Specialisation;
+import com.example.medrest.service.DepartmentService;
 import com.example.medrest.service.DoctorService;
+import com.example.medrest.service.PatientService;
+import com.example.medrest.service.SpecialisationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,9 +30,18 @@ import java.util.stream.Collectors;
 @RequestMapping("api/doctors")
 public class DoctorController {
     private final DoctorService doctorService;
+    private final DepartmentService departmentService;
+    private final SpecialisationService specialisationService;
+    private final PatientService patientService;
 
-    public DoctorController(@Autowired DoctorService doctorService) {
+    public DoctorController(@Autowired DoctorService doctorService,
+                            @Autowired DepartmentService departmentService,
+                            @Autowired SpecialisationService specialisationService,
+                            @Autowired PatientService patientService) {
         this.doctorService = doctorService;
+        this.departmentService = departmentService;
+        this.specialisationService = specialisationService;
+        this.patientService = patientService;
     }
 
     @Operation(summary = "Get information about all the doctors",
@@ -129,6 +144,51 @@ public class DoctorController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> removeDoctor(@PathVariable("id") Long id) {
         Boolean isOperationSuccessful = doctorService.deleteDoctor(id);
+        if (isOperationSuccessful) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Operation(summary = "Set a specialisation for a doctor",
+            operationId = "setDoctorSpecialisation",
+            description = "Firstly give the id of the doctor entity which you want to modify and" +
+                    " secondly the id of the specialisation that you want your doctor to have")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "specialisation for the doctor was set"),
+            @ApiResponse(responseCode = "404", description = "doctor or specialisation not found"),
+            @ApiResponse(responseCode = "500", description = "Something went wrong")
+    })
+    @PatchMapping(path = "/{docId}/specialisation/{specId}")
+    public ResponseEntity<Void> setDoctorSpecialisation(@PathVariable("docId") Long doctorId, @PathVariable("specId") Long specialisationId) {
+        Doctor existingDoctor = doctorService.getDoctorById(doctorId);
+        Specialisation existingSpecialisation = specialisationService.getSpecialisationById(specialisationId);
+        existingDoctor.setSpecialization(existingSpecialisation);
+        Boolean isOperationSuccessful = doctorService.patchDoctor(doctorId, existingDoctor);
+        if (isOperationSuccessful) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Operation(summary = "assign a doctor to a department",
+            operationId = "assignDoctorDepartment",
+            description = "Firstly give the id of the doctor entity which you want to modify and" +
+                    " secondly the id of the department that you want your doctor to be in")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "department for the doctor was assigned"),
+            @ApiResponse(responseCode = "404", description = "doctor or department not found"),
+            @ApiResponse(responseCode = "500", description = "Something went wrong")
+    })
+    @PatchMapping(path = "/{docId}/department/{depId}")
+    public ResponseEntity<Void> assignDoctorDepartment(@PathVariable("docId") Long doctorId,
+                                                       @PathVariable("depId") Long departmentId) {
+        Doctor existingDoctor = doctorService.getDoctorById(doctorId);
+        Department existingDepartment = departmentService.getDepartment(departmentId);
+        existingDoctor.setDepartment(existingDepartment);
+        Boolean isOperationSuccessful = doctorService.patchDoctor(doctorId, existingDoctor);
         if (isOperationSuccessful) {
             return ResponseEntity.noContent().build();
         } else {

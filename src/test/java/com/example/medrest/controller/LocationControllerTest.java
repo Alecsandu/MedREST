@@ -3,6 +3,7 @@ package com.example.medrest.controller;
 import com.example.medrest.dto.SpecialisationDto;
 import com.example.medrest.exception.NotFoundException;
 import com.example.medrest.model.Location;
+import com.example.medrest.service.DepartmentService;
 import com.example.medrest.service.LocationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
@@ -33,6 +34,8 @@ public class LocationControllerTest {
 
     @MockBean
     private LocationService locationService;
+    @MockBean
+    private DepartmentService departmentService;
 
     private static Location staticLocation;
     private static List<Location> initialLocationList;
@@ -127,6 +130,7 @@ public class LocationControllerTest {
         String endpoint = "/api/locations/{id}";
         testLocation.setId(1L);
 
+        when(departmentService.checkIfAnyDepartmentHasGivenLocation(anyLong())).thenReturn(true);
         when(locationService.deleteLocation(1L)).thenReturn(true);
         mockMvc.perform(delete(endpoint, 1L)).andExpect(status().isNoContent());
     }

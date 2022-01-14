@@ -1,9 +1,13 @@
 package com.example.medrest.controller;
 
 import com.example.medrest.dto.DepartmentDto;
+import com.example.medrest.exception.CanNotDeleteException;
 import com.example.medrest.mapper.DepartmentMapper;
 import com.example.medrest.model.Department;
+import com.example.medrest.model.Location;
 import com.example.medrest.service.DepartmentService;
+import com.example.medrest.service.DoctorService;
+import com.example.medrest.service.LocationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,9 +28,15 @@ import java.util.stream.Collectors;
 @RequestMapping("api/departments")
 public class DepartmentController {
     private final DepartmentService departmentService;
+    private final LocationService locationService;
+    private final DoctorService doctorService;
 
-    public DepartmentController(@Autowired DepartmentService departmentService) {
+    public DepartmentController(@Autowired DepartmentService departmentService,
+                                @Autowired LocationService locationService,
+                                @Autowired DoctorService doctorService) {
         this.departmentService = departmentService;
+        this.locationService = locationService;
+        this.doctorService = doctorService;
     }
 
     @Operation(summary = "Get the names of all the departments",
@@ -47,7 +57,7 @@ public class DepartmentController {
 
     @Operation(summary = "Get department by id",
             operationId = "getDepartmentById",
-            description = "With the help of a department id we can get informations about it")
+            description = "With the help of a department id we can get information about it")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Found department",
                 content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -81,12 +91,12 @@ public class DepartmentController {
             operationId = "changeDepartment",
             description = "Change the information about a department by providing an id and new data")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "department was updated"),
-            @ApiResponse(responseCode = "404", description = "department not found"),
+            @ApiResponse(responseCode = "204", description = "Department was updated"),
+            @ApiResponse(responseCode = "404", description = "Department not found"),
             @ApiResponse(responseCode = "500", description = "Something went wrong")
     })
     @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> changeDepartment(@PathVariable Long id, @RequestBody Department departmentEntity) {
+    public ResponseEntity<Void> changeDepartment(@PathVariable Long id, @RequestBody @Valid Department departmentEntity) {
         Boolean isOperationSuccessful = departmentService.updateDepartment(id, departmentEntity);
         if (isOperationSuccessful) {
             return ResponseEntity.noContent().build();
@@ -99,8 +109,8 @@ public class DepartmentController {
             operationId = "patchDepartment",
             description = "A part of the information about department can be changed")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "department was patched"),
-            @ApiResponse(responseCode = "404", description = "department not found"),
+            @ApiResponse(responseCode = "204", description = "Department was patched"),
+            @ApiResponse(responseCode = "404", description = "Department not found"),
             @ApiResponse(responseCode = "500", description = "Something went wrong")
     })
     @PatchMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -117,13 +127,40 @@ public class DepartmentController {
             operationId = "removeDepartment",
             description = "This endpoint removes a department from the database when an id is provided")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "department was deleted"),
-            @ApiResponse(responseCode = "404", description = "department not found"),
+            @ApiResponse(responseCode = "204", description = "Department was deleted"),
+            @ApiResponse(responseCode = "404", description = "Department not found"),
+            @ApiResponse(responseCode = "409", description = "The department can not be deleted because it has doctors assigned to it"),
             @ApiResponse(responseCode = "500", description = "Something went wrong")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> removeDepartment(@PathVariable("id") Long id) {
+        Boolean canDepartmentBeDeleted = doctorService.checkIfAnyDoctorIsAssignedToGivenDepartment(id);
+        if (!canDepartmentBeDeleted) {
+            throw new CanNotDeleteException("Department can not be deleted");
+        }
         Boolean isOperationSuccessful = departmentService.deleteDepartment(id);
+        if (isOperationSuccessful) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Operation(summary = "Set a location for a department",
+            operationId = "setDepartmentLocation",
+            description = "Firstly give the id of the department that you want to modify and" +
+                    " secondly the id of the location that you want your department to be set in")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Location for the department was set"),
+            @ApiResponse(responseCode = "404", description = "Department or location not found"),
+            @ApiResponse(responseCode = "500", description = "Something went wrong")
+    })
+    @PatchMapping(path = "/{depId}/location/{locId}")
+    public ResponseEntity<Void> setDepartmentLocation(@PathVariable("depId") Long departmentId, @PathVariable("locId") Long locationId) {
+        Location existingLocation = locationService.getLocationById(locationId);
+        Department existingDepartment = departmentService.getDepartment(departmentId);
+        existingDepartment.setLocation(existingLocation);
+        Boolean isOperationSuccessful = departmentService.patchDepartment(departmentId, existingDepartment);
         if (isOperationSuccessful) {
             return ResponseEntity.noContent().build();
         } else {

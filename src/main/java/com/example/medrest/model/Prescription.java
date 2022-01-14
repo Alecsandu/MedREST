@@ -3,6 +3,7 @@ package com.example.medrest.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
@@ -16,6 +17,7 @@ public class Prescription {
     private Long id;
 
     @NotNull
+    @NotBlank
     @Column(name = "medicament_name", nullable = false)
     private String medicamentName;
 
@@ -27,7 +29,7 @@ public class Prescription {
     private Integer amountToTake;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "prescriptions")
+    @ManyToMany(mappedBy = "prescriptions", fetch = FetchType.EAGER)
     private List<Patient> patients;     //patients that have a certain prescription
 
     public Prescription() {
@@ -80,6 +82,14 @@ public class Prescription {
         this.patients = patients;
     }
 
+    public void addPatients(Patient patient) {
+        patients.add(patient);
+    }
+
+    public void removePatient(Patient patient) {
+        patients.remove(patient);
+    }
+
     public void patch (Prescription prescription) {
         if (prescription != null) {
             if (prescription.getMedicamentName() != null) {
@@ -90,6 +100,9 @@ public class Prescription {
             }
             if (prescription.getAmountToTake() != null) {
                 amountToTake = prescription.getAmountToTake();
+            }
+            if (prescription.getPatients() != null && !prescription.getPatients().isEmpty()) {
+                patients = prescription.getPatients();
             }
         }
     }

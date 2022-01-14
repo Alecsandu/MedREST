@@ -6,9 +6,12 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "doctors")
@@ -18,20 +21,22 @@ public class Doctor {
     private Long id;
 
     @NotNull
+    @NotBlank
     @Column(name = "name", nullable = false)
     private String name;
+
 
     @Column(name = "salary")
     private Integer salary;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "specialization_id")
     @JsonIgnore
     private Specialisation specialization;
 
-    @ManyToMany(mappedBy = "doctors")
+    @ManyToMany(mappedBy = "doctors", fetch = FetchType.EAGER)
     @JsonIgnore
-    private List<Patient> patients;
+    private Set<Patient> patients;
 
     @ManyToOne
     @JoinColumn(name = "department_id", referencedColumnName = "id")
@@ -45,6 +50,7 @@ public class Doctor {
     public Doctor(String name, Integer salary) {
         this.name = name;
         this.salary = salary;
+        this.patients = new HashSet<>();
     }
 
     public Long getId() {
@@ -79,11 +85,11 @@ public class Doctor {
         this.specialization = specialization;
     }
 
-    public List<Patient> getPatients() {
+    public Set<Patient> getPatients() {
         return patients;
     }
 
-    public void setPatients(List<Patient> patients) {
+    public void setPatients(Set<Patient> patients) {
         this.patients = patients;
     }
 
@@ -95,13 +101,30 @@ public class Doctor {
         this.department = department;
     }
 
+    public void addPatients(Patient patient) {
+        patients.add(patient);
+    }
+
+    public void removePatient(Patient patient) {
+        patients.remove(patient);
+    }
+
     public void patch (Doctor doctor) {
         if (doctor != null) {
             if (doctor.getName() != null) {
                 name = doctor.getName();
             }
-            if(doctor.getSalary() != null) {
+            if (doctor.getSalary() != null) {
                 salary = doctor.getSalary();
+            }
+            if (doctor.getSpecialization() != null) {
+                specialization = doctor.getSpecialization();
+            }
+            if (doctor.getDepartment() != null) {
+                department = doctor.getDepartment();
+            }
+            if (doctor.getPatients() != null && !doctor.getPatients().isEmpty()) {
+                patients = doctor.getPatients();
             }
         }
     }

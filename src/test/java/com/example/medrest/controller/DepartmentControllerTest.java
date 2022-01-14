@@ -1,12 +1,13 @@
 package com.example.medrest.controller;
 
 import com.example.medrest.dto.DepartmentDto;
-import com.example.medrest.dto.SpecialisationDto;
 import com.example.medrest.exception.DepartmentNotFoundException;
 import com.example.medrest.exception.NotFoundException;
 import com.example.medrest.model.Department;
-import com.example.medrest.model.Specialisation;
+import com.example.medrest.model.Location;
 import com.example.medrest.service.DepartmentService;
+import com.example.medrest.service.DoctorService;
+import com.example.medrest.service.LocationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +25,6 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = DepartmentController.class)
@@ -37,10 +37,15 @@ class DepartmentControllerTest {
 
     @MockBean
     private DepartmentService departmentService;
+    @MockBean
+    private LocationService departmentLocationService;
+    @MockBean
+    private DoctorService doctorService;
 
     private static Department staticDepartment;
     private static List<Department> initialDepartmentList;
     private Department testDepartment;
+    private Location testLocation;
 
     @BeforeAll
     public static void setupStatic() {
@@ -134,7 +139,12 @@ class DepartmentControllerTest {
         String endpoint = "/api/departments/{id}";
         testDepartment.setId(1L);
 
+        when(doctorService.checkIfAnyDoctorIsAssignedToGivenDepartment(anyLong())).thenReturn(true);
         when(departmentService.deleteDepartment(1L)).thenReturn(true);
         mockMvc.perform(delete(endpoint, 1L)).andExpect(status().isNoContent());
+    }
+
+    @Test
+    void setDepartmentLocation() {
     }
 }

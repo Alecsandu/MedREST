@@ -1,12 +1,22 @@
 package com.example.medrest.dto;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 public class PatientDto {
+    @NotNull
+    @NotBlank
     private String firstName;
 
+    @NotNull
+    @NotBlank
     private String lastName;
 
+    @NotNull
+    @NotBlank
     private String phoneNumber;
 
+    @NotBlank
     private String emailAddress;
 
     public PatientDto() {

@@ -1,8 +1,10 @@
 package com.example.medrest.controller;
 
 import com.example.medrest.dto.SpecialisationDto;
+import com.example.medrest.exception.CanNotDeleteException;
 import com.example.medrest.mapper.SpecialisationMapper;
 import com.example.medrest.model.Specialisation;
+import com.example.medrest.service.DoctorService;
 import com.example.medrest.service.SpecialisationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -24,9 +26,12 @@ import java.util.stream.Collectors;
 @RequestMapping("api/specialisations")
 public class SpecialisationController {
     private final SpecialisationService specialisationService;
+    private final DoctorService doctorService;
 
-    public SpecialisationController(@Autowired SpecialisationService specialisationService) {
+    public SpecialisationController(@Autowired SpecialisationService specialisationService,
+                                    @Autowired DoctorService doctorService) {
         this.specialisationService = specialisationService;
+        this.doctorService = doctorService;
     }
 
     @Operation(summary = "Get information about all the specialisations",
@@ -124,10 +129,15 @@ public class SpecialisationController {
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Specialisation was deleted"),
             @ApiResponse(responseCode = "404", description = "Specialisation not found"),
+            @ApiResponse(responseCode = "409", description = "the specialisation can not be deleted because doctors has it set"),
             @ApiResponse(responseCode = "500", description = "Something went wrong")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> removeSpecialisation(@PathVariable("id") Long id) {
+        Boolean canSpecialisationBeDeleted = doctorService.checkIfAnyDoctorHasSetGivenSpecialisation(id);
+        if (!canSpecialisationBeDeleted) {
+            throw new CanNotDeleteException("Specialisation can not be deleted");
+        }
         Boolean isOperationSuccessful = specialisationService.deleteSpecialisation(id);
         if (isOperationSuccessful) {
             return ResponseEntity.noContent().build();

@@ -1,9 +1,15 @@
 package com.example.medrest.controller;
 
+import com.example.medrest.dto.DepartmentDto;
 import com.example.medrest.dto.DoctorDto;
 import com.example.medrest.exception.NotFoundException;
+import com.example.medrest.model.Department;
 import com.example.medrest.model.Doctor;
+import com.example.medrest.model.Specialisation;
+import com.example.medrest.service.DepartmentService;
 import com.example.medrest.service.DoctorService;
+import com.example.medrest.service.PatientService;
+import com.example.medrest.service.SpecialisationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +40,12 @@ class DoctorControllerTest {
 
     @MockBean
     private DoctorService doctorService;
+    @MockBean
+    private DepartmentService departmentService;
+    @MockBean
+    private SpecialisationService specialisationService;
+    @MockBean
+    private PatientService patientService;
 
     private static Doctor staticDoctor;
     private static List<Doctor> initialDoctorList;
@@ -134,5 +146,36 @@ class DoctorControllerTest {
 
         when(doctorService.deleteDoctor(1L)).thenReturn(true);
         mockMvc.perform(delete(endpoint, 1L)).andExpect(status().isNoContent());
+    }
+
+    @Test
+    void setDoctorSpecialisation() throws Exception {
+        String endpoint = "/api/doctors/{docId}/specialisation/{specId}";
+        testDoctor.setId(1L);
+        Specialisation specialisation = new Specialisation("Dermatology", 1000, 9000);
+        specialisation.setId(1L);
+
+        when(doctorService.getDoctorById(1L)).thenReturn(testDoctor);
+        when(specialisationService.getSpecialisationById(1L)).thenReturn(specialisation);
+        when(doctorService.patchDoctor(1L, testDoctor)).thenReturn(true);
+        mockMvc.perform(patch(endpoint, 1L, 1L)).andExpect(status().isNoContent());
+
+        when(doctorService.getDoctorById(1L)).thenReturn(testDoctor);
+        when(specialisationService.getSpecialisationById(1L)).thenReturn(specialisation);
+        when(doctorService.patchDoctor(1L, testDoctor)).thenReturn(false);
+        mockMvc.perform(patch(endpoint, 1L, 1L)).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void assignDoctorDepartment() throws Exception {
+        String endpoint = "/api/doctors/{docId}/department/{depId}";
+        testDoctor.setId(1L);
+        Department department = new Department("Dermatology");
+        department.setId(1L);
+
+        when(doctorService.getDoctorById(1L)).thenReturn(testDoctor);
+        when(departmentService.getDepartment(1L)).thenReturn(department);
+        when(doctorService.patchDoctor(1L, testDoctor)).thenReturn(true);
+        mockMvc.perform(patch(endpoint, 1L, 1L)).andExpect(status().isNoContent());
     }
 }

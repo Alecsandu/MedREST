@@ -1,7 +1,12 @@
 package com.example.medrest.dto;
 
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 public class PrescriptionDto {
+    @NotNull
+    @NotBlank
     private String medicamentName;
 
     private Integer price;

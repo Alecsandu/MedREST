@@ -4,18 +4,12 @@ import com.example.medrest.exception.DepartmentNotFoundException;
 import com.example.medrest.exception.NotFoundException;
 import com.example.medrest.model.Department;
 import com.example.medrest.repository.DepartmentRepository;
-import com.example.medrest.repository.DoctorRepository;
-import com.example.medrest.repository.LocationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 public class DepartmentService {
@@ -81,5 +75,15 @@ public class DepartmentService {
         } else {
             return false;
         }
+    }
+
+    public Boolean checkIfAnyDepartmentHasGivenLocation(Long id) {
+        List<Department> existingDepartments = departmentRepository.findAll();
+        for(Department department:existingDepartments) {
+            if (Objects.equals(department.getLocation().getId(), id)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

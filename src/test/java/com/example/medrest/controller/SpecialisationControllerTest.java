@@ -4,6 +4,7 @@ import com.example.medrest.dto.SpecialisationDto;
 import com.example.medrest.exception.NotFoundException;
 import com.example.medrest.mapper.SpecialisationMapper;
 import com.example.medrest.model.Specialisation;
+import com.example.medrest.service.DoctorService;
 import com.example.medrest.service.SpecialisationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,6 +36,8 @@ class SpecialisationControllerTest {
 
     @MockBean
     private SpecialisationService specialisationService;
+    @MockBean
+    private DoctorService doctorService;
 
     private static Specialisation staticSpecialisation;
     private static List<Specialisation> initialSpecialisationList;
@@ -133,6 +136,7 @@ class SpecialisationControllerTest {
         String endpoint = "/api/specialisations/{id}";
         testSpecialisation.setId(1L);
 
+        when(doctorService.checkIfAnyDoctorHasSetGivenSpecialisation(anyLong())).thenReturn(true);
         when(specialisationService.deleteSpecialisation(1L)).thenReturn(true);
         mockMvc.perform(delete(endpoint, 1L)).andExpect(status().isNoContent());
     }

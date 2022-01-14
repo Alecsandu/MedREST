@@ -1,10 +1,21 @@
 package com.example.medrest.dto;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 public class LocationDto {
+    @NotNull
+    @NotBlank
     private String city;
 
+    @NotNull
+    @NotBlank
     private String street;
 
+    @Min(1)
+    @Max(10000)
     private Integer specialNumber;
 
     public LocationDto() {
