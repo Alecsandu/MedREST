@@ -1,15 +1,11 @@
 package com.example.medrest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -44,7 +40,6 @@ public class Doctor {
     private Department department;
 
     public Doctor() {
-        // Every entity has a default constructor declared
     }
 
     public Doctor(String name, Integer salary) {

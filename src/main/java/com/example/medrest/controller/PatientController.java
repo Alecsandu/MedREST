@@ -163,15 +163,8 @@ public class PatientController {
     @PostMapping(path = "/{patientId}/prescriptions/{prescriptionId}")
     public ResponseEntity<Void> addPrescriptionToPatient(@PathVariable("patientId") Long patientId,
                                                          @PathVariable("prescriptionId") Long prescriptionId) {
-        Patient existingPatient = patientService.getPatientById(patientId);
-        Prescription existingPrescription = prescriptionService.getPrescriptionById(prescriptionId);
-        existingPatient.addPrescriptions(existingPrescription);
-        Boolean isOperationSuccessful = patientService.updatePatient(patientId, existingPatient);
-        if (isOperationSuccessful) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        patientService.addPrescriptionToPatient(prescriptionId, patientId);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Get the prescriptions that are given to the patient with given id",
@@ -186,7 +179,8 @@ public class PatientController {
             @ApiResponse(responseCode = "404", description = "patient not found"),
             @ApiResponse(responseCode = "500", description = "Something went wrong")
     })
-    @GetMapping(path = "/{id}/patients", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
+    @GetMapping(path = "/{id}/prescriptions", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<PrescriptionDto>> getPatientPrescriptions(@PathVariable("id") Long patientId) {
         Patient existingPatient = patientService.getPatientById(patientId);
         if (existingPatient.getPrescriptions().isEmpty()) {
@@ -208,12 +202,7 @@ public class PatientController {
     @DeleteMapping(path = "/{patientId}/prescriptions/{prescriptionId}")
     public ResponseEntity<Void> removePatientPrescription(@PathVariable("patientId") Long patientId,
                                                           @PathVariable("prescriptionId") Long prescriptionId) {
-        Patient patient = patientService.getPatientById(patientId);
-        Prescription prescription = prescriptionService.getPrescriptionById(prescriptionId);
-        patient.removePrescriptions(prescription);
-        prescription.removePatient(patient);
-        Patient samePatient = patientService.addPatient(patient);
-        Prescription samePrescription = prescriptionService.addPrescription(prescription);
+        patientService.removePrescriptionFromPatient(prescriptionId, patientId);
         return ResponseEntity.noContent().build();
     }
 

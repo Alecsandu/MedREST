@@ -4,8 +4,10 @@ import com.example.medrest.exception.NotFoundException;
 import com.example.medrest.model.Patient;
 import com.example.medrest.model.Prescription;
 import com.example.medrest.repository.PatientRepository;
+import com.example.medrest.repository.PrescriptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,13 +15,15 @@ import java.util.Optional;
 @Service
 public class PatientService {
     public final PatientRepository patientRepository;
+    public final PrescriptionRepository prescriptionRepository;
 
-    public PatientService(@Autowired PatientRepository patientRepository) {
+    public PatientService(@Autowired PatientRepository patientRepository, @Autowired PrescriptionRepository prescriptionRepository) {
         this.patientRepository = patientRepository;
+        this.prescriptionRepository = prescriptionRepository;
     }
 
     public List<Patient> getAllPatients() {
-        List<Patient> patients = (List<Patient>) patientRepository.findAll();
+        List<Patient> patients = patientRepository.findAll();
         if(!patients.isEmpty()) {
             return patients;
         } else {
@@ -74,5 +78,21 @@ public class PatientService {
         } else {
             return false;
         }
+    }
+
+    @Transactional
+    public void addPrescriptionToPatient(Long prescriptionId, Long patientId) {
+        Prescription prescription = prescriptionRepository.getById(prescriptionId);
+        Patient patient = patientRepository.getById(patientId);
+        patient.addPrescription(prescription);
+        patientRepository.save(patient);
+    }
+
+    @Transactional
+    public void removePrescriptionFromPatient(Long prescriptionId, Long patientId) {
+        Prescription prescription = prescriptionRepository.getById(prescriptionId);
+        Patient patient = patientRepository.getById(patientId);
+        patient.removePrescriptions(prescription);
+        patientRepository.save(patient);
     }
 }

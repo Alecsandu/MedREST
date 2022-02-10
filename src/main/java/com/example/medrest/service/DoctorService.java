@@ -28,7 +28,7 @@ public class DoctorService {
     }
 
     public List<Doctor> getAllDoctors() {
-        List<Doctor> doctors = (List<Doctor>) doctorRepository.findAll();
+        List<Doctor> doctors = doctorRepository.findAll();
         if (!doctors.isEmpty()) {
             return doctors;
         } else {
@@ -86,7 +86,7 @@ public class DoctorService {
     }
 
     public Boolean checkIfAnyDoctorIsAssignedToGivenDepartment(Long id) {
-        List<Doctor> existingDoctors = (List<Doctor>)doctorRepository.findAll();
+        List<Doctor> existingDoctors = doctorRepository.findAll();
         for(Doctor doctor:existingDoctors) {
             if (Objects.equals(doctor.getDepartment().getId(), id)) {
                 return false;
@@ -96,7 +96,7 @@ public class DoctorService {
     }
 
     public Boolean checkIfAnyDoctorHasSetGivenSpecialisation(Long id) {
-        List<Doctor> existingDoctors = (List<Doctor>)doctorRepository.findAll();
+        List<Doctor> existingDoctors = doctorRepository.findAll();
         for(Doctor doctor:existingDoctors) {
             if (Objects.equals(doctor.getSpecialization().getId(), id)) {
                 return false;

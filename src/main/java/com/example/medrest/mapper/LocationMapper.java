@@ -9,4 +9,8 @@ public class LocationMapper {
     public static LocationDto locationToLocationDto(Location location) {
         return new LocationDto(location.getCity(), location.getStreet(), location.getSpecialNumber());
     }
+
+    public static Location locationDtoToLocation(LocationDto locationDto) {
+        return new Location(locationDto.getCity(), locationDto.getStreet(), locationDto.getSpecialNumber());
+    }
 }

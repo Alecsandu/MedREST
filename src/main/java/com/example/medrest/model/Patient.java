@@ -1,13 +1,13 @@
 package com.example.medrest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "patients")
@@ -45,7 +45,7 @@ public class Patient {
     @JsonIgnore
     private Set<Doctor> doctors;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "patients_prescriptions",
             joinColumns = @JoinColumn(name = "patient_id"),
@@ -55,7 +55,6 @@ public class Patient {
     private Set<Prescription> prescriptions;
 
     public Patient() {
-        // Every entity has a default constructor declared
     }
 
     public Patient(String firstName, String lastName, String phoneNumber, String emailAddress) {
@@ -63,8 +62,8 @@ public class Patient {
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
         this.emailAddress = emailAddress;
-        prescriptions = new HashSet<>();
-        doctors = new HashSet<>();
+        this.prescriptions = new HashSet<>();
+        this.doctors = new HashSet<>();
     }
 
     public Long getId() {
@@ -123,7 +122,7 @@ public class Patient {
         this.prescriptions = prescriptions;
     }
 
-    public void addPrescriptions(Prescription prescription) {
+    public void addPrescription(Prescription prescription) {
         prescriptions.add(prescription);
     }
 

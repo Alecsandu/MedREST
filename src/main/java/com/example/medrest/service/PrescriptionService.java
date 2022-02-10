@@ -17,7 +17,7 @@ public class PrescriptionService {
     }
 
     public List<Prescription> getAllPrescriptions() {
-        List<Prescription> prescriptions = (List<Prescription>) prescriptionRepository.findAll();
+        List<Prescription> prescriptions = prescriptionRepository.findAll();
         if (!prescriptions.isEmpty()) {
             return prescriptions;
         } else {

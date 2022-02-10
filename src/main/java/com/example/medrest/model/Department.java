@@ -1,6 +1,5 @@
 package com.example.medrest.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -31,7 +30,6 @@ public class Department {
     private List<Doctor> doctors;
 
     public Department() {
-        // Every entity has a default constructor declared
     }
 
     public Department(String departmentName) {

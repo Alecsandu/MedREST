@@ -1,5 +1,6 @@
 package com.example.medrest.controller;
 
+import com.example.medrest.dto.LocationDto;
 import com.example.medrest.dto.SpecialisationDto;
 import com.example.medrest.exception.NotFoundException;
 import com.example.medrest.model.Location;
@@ -80,6 +81,7 @@ public class LocationControllerTest {
     @Test
     void testCreateLocation() throws Exception {
         String endpoint = "/api/locations";
+        LocationDto locationDto = new LocationDto("Ploiesti", "Republicii", 25);
         testLocation.setId(1L);
 
         when(locationService.addLocation(testLocation)).thenReturn(testLocation);
@@ -87,7 +89,7 @@ public class LocationControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
                         .characterEncoding("UTF-8")
-                        .content(objectMapper.writeValueAsString(testLocation)))
+                        .content(objectMapper.writeValueAsString(locationDto)))
                 .andExpect(status().isCreated());
     }
 

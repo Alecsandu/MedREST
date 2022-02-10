@@ -18,7 +18,7 @@ public class LocationService {
     }
 
     public List<Location> getAllLocations() {
-        List<Location> locations = (List<Location>) locationRepository.findAll();
+        List<Location> locations = locationRepository.findAll();
         if (!locations.isEmpty()) {
             return locations;
         } else {

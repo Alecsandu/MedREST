@@ -74,15 +74,14 @@ public class LocationController {
             operationId = "createLocation",
             description = "By providing the basic values for a location you can create one")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Location was created",
+            @ApiResponse(responseCode = "201", description = "Location was added",
                     content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                         schema = @Schema(implementation = LocationDto.class))}),
             @ApiResponse(responseCode = "500", description = "Something went wrong")
     })
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> createLocation(@RequestBody @Valid LocationDto newLocation) {
-        Location toBeSavedLocation = new Location(newLocation.getCity(), newLocation.getStreet(), newLocation.getSpecialNumber());
-        Location savedLocation = locationService.addLocation(toBeSavedLocation);
+    public ResponseEntity<Void> createLocation(@Valid @RequestBody LocationDto newLocation) {
+        Location savedLocation = locationService.addLocation(LocationMapper.locationDtoToLocation(newLocation));
         URI uri = URI.create("api/locations/" + savedLocation.getId());
         return ResponseEntity.created(uri).build();
     }
@@ -96,7 +95,7 @@ public class LocationController {
             @ApiResponse(responseCode = "500", description = "Something went wrong")
     })
     @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> changeLocation(@PathVariable Long id, @RequestBody Location locationEntity) {
+    public ResponseEntity<Void> changeLocation(@PathVariable Long id, @Valid @RequestBody Location locationEntity) {
         Boolean isOperationSuccessful = locationService.updateLocation(id, locationEntity);
         if (isOperationSuccessful) {
             return ResponseEntity.noContent().build();
@@ -114,7 +113,7 @@ public class LocationController {
             @ApiResponse(responseCode = "500", description = "Something went wrong")
     })
     @PatchMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> patchLocation(@PathVariable("id") Long id, @RequestBody Location locationEntity) {
+    public ResponseEntity<Void> patchLocation(@PathVariable("id") Long id, @Valid @RequestBody Location locationEntity) {
         Boolean isOperationSuccessful = locationService.patchLocation(id, locationEntity);
         if (isOperationSuccessful) {
             return ResponseEntity.noContent().build();

@@ -42,13 +42,12 @@ class PatientControllerTest {
     @MockBean
     private DoctorService doctorService;
 
-    private static Patient staticPatient;
     private static List<Patient> initialPatientList;
     private Patient testPatient;
 
     @BeforeAll
     public static void setupStatic() {
-        staticPatient = new Patient("Val",
+        Patient staticPatient = new Patient("Val",
                 "Andrei",
                 "0730000000",
                 "email@gmail.com");
@@ -171,7 +170,7 @@ class PatientControllerTest {
 
     @Test
     void getPatientPrescriptions() throws Exception {
-        String endpoint = "/api/patients/{id}/patients";
+        String endpoint = "/api/patients/{id}/prescriptions";
         testPatient.setId(1L);
 
         when(patientService.getPatientById(1L)).thenReturn(testPatient);
@@ -186,7 +185,7 @@ class PatientControllerTest {
                 35,
                 1);
         prescription.setId(1L);
-        testPatient.addPrescriptions(prescription);
+        testPatient.addPrescription(prescription);
         prescription.addPatients(testPatient);
 
         when(patientService.getPatientById(1L)).thenReturn(testPatient);

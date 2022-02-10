@@ -30,7 +30,6 @@ public class Location {
     private Integer specialNumber;
 
     public Location() {
-        // Every entity has a default constructor declared
     }
 
     public Location(String city, String street, Integer number) {

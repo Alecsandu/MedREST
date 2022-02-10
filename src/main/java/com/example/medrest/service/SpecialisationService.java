@@ -17,7 +17,7 @@ public class SpecialisationService {
     }
 
     public List<Specialisation> getSpecializations() {
-        List<Specialisation> specialisations = (List<Specialisation>) specialisationRepository.findAll();
+        List<Specialisation> specialisations = specialisationRepository.findAll();
         if(!specialisations.isEmpty()) {
             return specialisations;
         } else {

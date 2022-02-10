@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 @Table(name = "prescriptions")
@@ -29,19 +27,18 @@ public class Prescription {
     @Column(name = "amount_to_take", nullable = false)
     private Integer amountToTake;
 
+    @ManyToMany(mappedBy = "prescriptions", fetch = FetchType.LAZY)
     @JsonIgnore
-    @ManyToMany(mappedBy = "prescriptions", fetch = FetchType.EAGER)
-    private List<Patient> patients;     //patients that have a certain prescription
+    private Set<Patient> patients;
 
     public Prescription() {
-        // Every entity has a default constructor declared
     }
 
     public Prescription(String medicamentName, Integer price, Integer amountToTake) {
         this.medicamentName = medicamentName;
         this.price = price;
         this.amountToTake = amountToTake;
-        patients = new ArrayList<>();
+        this.patients = new HashSet<>();
     }
 
     public Long getId() {
@@ -76,11 +73,11 @@ public class Prescription {
         this.amountToTake = amountToTake;
     }
 
-    public List<Patient> getPatients() {
+    public Set<Patient> getPatients() {
         return patients;
     }
 
-    public void setPatients(List<Patient> patients) {
+    public void setPatients(Set<Patient> patients) {
         this.patients = patients;
     }
 
