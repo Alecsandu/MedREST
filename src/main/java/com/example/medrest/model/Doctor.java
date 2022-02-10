@@ -21,7 +21,6 @@ public class Doctor {
     @Column(name = "name", nullable = false)
     private String name;
 
-
     @Column(name = "salary")
     private Integer salary;
 
@@ -96,7 +95,7 @@ public class Doctor {
         this.department = department;
     }
 
-    public void addPatients(Patient patient) {
+    public void addPatient(Patient patient) {
         patients.add(patient);
     }
 

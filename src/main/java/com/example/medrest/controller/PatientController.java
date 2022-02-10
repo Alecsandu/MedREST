@@ -8,10 +8,8 @@ import com.example.medrest.mapper.PatientMapper;
 import com.example.medrest.mapper.PrescriptionMapper;
 import com.example.medrest.model.Doctor;
 import com.example.medrest.model.Patient;
-import com.example.medrest.model.Prescription;
 import com.example.medrest.service.DoctorService;
 import com.example.medrest.service.PatientService;
-import com.example.medrest.service.PrescriptionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -33,14 +31,11 @@ import java.util.stream.Collectors;
 @RequestMapping("api/patients")
 public class PatientController {
     private final PatientService patientService;
-    private final PrescriptionService prescriptionService;
     private final DoctorService doctorService;
 
     public PatientController(@Autowired PatientService patientService,
-                             @Autowired PrescriptionService prescriptionService,
                              @Autowired DoctorService doctorService) {
         this.patientService = patientService;
-        this.prescriptionService = prescriptionService;
         this.doctorService = doctorService;
     }
 
@@ -48,7 +43,7 @@ public class PatientController {
             operationId = "getPatients",
             description = "This request provides data about each patient entity stored in the database")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "patients were found",
+            @ApiResponse(responseCode = "200", description = "Patients were found",
                     content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             array = @ArraySchema(schema = @Schema(implementation = PatientDto.class)))}
             ),
@@ -68,11 +63,11 @@ public class PatientController {
             operationId = "getPatient",
             description = "By using a valid id you can get the information about its corresponding patient")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "patient found",
+            @ApiResponse(responseCode = "200", description = "The patient was found",
                     content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = PatientDto.class))}),
-            @ApiResponse(responseCode = "404", description = "patient not found"),
-            @ApiResponse(responseCode = "500", description = "Something went wrong")
+            @ApiResponse(responseCode = "404", description = "The patient with the given id was not found"),
+            @ApiResponse(responseCode = "500", description = "Something went wrong on the server side")
     })
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PatientDto> getPatient(@PathVariable("id") Long id) {
@@ -151,13 +146,13 @@ public class PatientController {
         }
     }
 
-    @Operation(summary = "add prescriptions to a patient",
+    @Operation(summary = "Add a prescriptions to a patient using ids",
             operationId = "addPrescriptionToPatient",
             description = "Firstly give the id of the patient entity which you want to modify and" +
                     " secondly the id of the prescription that you want add give to the patient")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "prescription was assigned to the patient"),
-            @ApiResponse(responseCode = "404", description = "patient or prescription not found"),
+            @ApiResponse(responseCode = "204", description = "Prescription was assigned to the patient"),
+            @ApiResponse(responseCode = "404", description = "Patient or prescription not found"),
             @ApiResponse(responseCode = "500", description = "Something went wrong")
     })
     @PostMapping(path = "/{patientId}/prescriptions/{prescriptionId}")
@@ -167,27 +162,28 @@ public class PatientController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Get the prescriptions that are given to the patient with given id",
+    @Operation(summary = "Get the prescriptions that are given to the patient with given id.",
             operationId = "getPrescriptionPatients",
             description = "By using a valid id you can get the information about its corresponding prescription")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "prescription's patients found",
+            @ApiResponse(responseCode = "200", description = "Prescription's patients found",
                     content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            array = @ArraySchema(schema = @Schema(implementation = PatientDto.class)))}
+                            array = @ArraySchema(schema = @Schema(implementation = PrescriptionDto.class)))}
             ),
-            @ApiResponse(responseCode = "204", description = "patient has no prescriptions"),
-            @ApiResponse(responseCode = "404", description = "patient not found"),
+            @ApiResponse(responseCode = "204", description = "Patient has no prescriptions"),
+            @ApiResponse(responseCode = "404", description = "Patient not found"),
             @ApiResponse(responseCode = "500", description = "Something went wrong")
     })
-    @Transactional
     @GetMapping(path = "/{id}/prescriptions", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<PrescriptionDto>> getPatientPrescriptions(@PathVariable("id") Long patientId) {
-        Patient existingPatient = patientService.getPatientById(patientId);
-        if (existingPatient.getPrescriptions().isEmpty()) {
+        List<PrescriptionDto> patientPrescriptions = patientService.getPatientPrescriptionsList(patientId)
+                .stream()
+                .map(PrescriptionMapper::prescriptionToPrescriptionDto)
+                .collect(Collectors.toList());
+        if (patientPrescriptions.isEmpty()) {
             return ResponseEntity.noContent().build();
         } else {
-            List<PrescriptionDto> patientDtoList = existingPatient.getPrescriptions().stream().map(PrescriptionMapper::prescriptionToPrescriptionDto).collect(Collectors.toList());
-            return ResponseEntity.ok(patientDtoList);
+            return ResponseEntity.ok(patientPrescriptions);
         }
     }
 
@@ -206,13 +202,13 @@ public class PatientController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "appoint a patient to a doctor",
+    @Operation(summary = "Appoint a patient to a doctor",
             operationId = "appointPatientToDoctor",
             description = "Firstly give the id of the patient entity which you want to modify and" +
                     " secondly the id of the prescription that you want add give to the patient")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "patient was assigned to the doctor"),
-            @ApiResponse(responseCode = "404", description = "patient or doctor not found"),
+            @ApiResponse(responseCode = "204", description = "The patient was assigned to the doctor"),
+            @ApiResponse(responseCode = "404", description = "Patient or doctor not found"),
             @ApiResponse(responseCode = "500", description = "Something went wrong")
     })
     @PostMapping(path = "/{patientId}/doctors/{doctorId}")
@@ -233,12 +229,12 @@ public class PatientController {
             operationId = "getPatientAppointmentsWithDoctors",
             description = "By using a valid patient id you can get the information about its corresponding doctors")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "patient appointments found",
+            @ApiResponse(responseCode = "200", description = "Patient appointments were found",
                     content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             array = @ArraySchema(schema = @Schema(implementation = DoctorDto.class)))}
             ),
-            @ApiResponse(responseCode = "204", description = "patient has no doctor appointments"),
-            @ApiResponse(responseCode = "404", description = "patient not found"),
+            @ApiResponse(responseCode = "204", description = "Patient has no doctor appointments"),
+            @ApiResponse(responseCode = "404", description = "Patient not found"),
             @ApiResponse(responseCode = "500", description = "Something went wrong")
     })
     @GetMapping(path = "/{id}/appointments", produces = MediaType.APPLICATION_JSON_VALUE)

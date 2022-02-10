@@ -84,6 +84,7 @@ public class DepartmentServiceTest {
                 () -> departmentService.getDepartment(anyLong()));
 
         //assert
+        assertNotNull(exception);
         assertEquals("The department with the given id was not found!",
                 exception.getMessage());
     }
@@ -119,12 +120,13 @@ public class DepartmentServiceTest {
     @DisplayName("Good path when the patch was done")
     void patchDepartmentWhenThePatchIsSuccessful() {
         Department department = new Department("Centru");
-        Department patchedDepartment = new Department("Vest");  //the final result
+        Department patchedDepartment = new Department("Vest");
 
         when(departmentRepository.findById(anyLong())).thenReturn(Optional.of(department));
         when(departmentRepository.save(any(Department.class))).thenReturn(patchedDepartment);
         Boolean result = departmentService.patchDepartment(anyLong(), patchedDepartment);
 
+        assertNotNull(result);
         assertTrue(result);
     }
 
@@ -140,7 +142,7 @@ public class DepartmentServiceTest {
 
     @Test
     void checkIfAnyDepartmentHasGivenLocation() {
-        when(departmentRepository.findAll()).thenReturn(new ArrayList<Department>());
+        when(departmentRepository.findAll()).thenReturn(new ArrayList<>());
         Boolean result = departmentService.checkIfAnyDepartmentHasGivenLocation(1L);
 
         assertNotNull(result);

@@ -36,7 +36,7 @@ public class Patient {
     @Column(name = "email_address")
     private String emailAddress;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "patients_doctors",
             joinColumns = @JoinColumn(name = "patient_id"),

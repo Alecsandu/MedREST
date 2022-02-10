@@ -9,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PatientService {
@@ -82,17 +84,43 @@ public class PatientService {
 
     @Transactional
     public void addPrescriptionToPatient(Long prescriptionId, Long patientId) {
-        Prescription prescription = prescriptionRepository.getById(prescriptionId);
-        Patient patient = patientRepository.getById(patientId);
-        patient.addPrescription(prescription);
-        patientRepository.save(patient);
+        Optional<Prescription> prescription = prescriptionRepository.findById(prescriptionId);
+        if (prescription.isPresent()) {
+            Optional<Patient> patient = patientRepository.findById(patientId);
+            if (patient.isPresent()) {
+                patient.get().addPrescription(prescription.get());
+                patientRepository.save(patient.get());
+            } else {
+                throw new NotFoundException("The patient with the given id was not found!\n");
+            }
+        } else {
+            throw new NotFoundException("The prescription with the given id was not found!\n");
+        }
     }
 
     @Transactional
     public void removePrescriptionFromPatient(Long prescriptionId, Long patientId) {
-        Prescription prescription = prescriptionRepository.getById(prescriptionId);
-        Patient patient = patientRepository.getById(patientId);
-        patient.removePrescriptions(prescription);
-        patientRepository.save(patient);
+        Optional<Prescription> prescription = prescriptionRepository.findById(prescriptionId);
+        if (prescription.isPresent()) {
+            Optional<Patient> patient = patientRepository.findById(patientId);
+            if (patient.isPresent()) {
+                patient.get().removePrescriptions(prescription.get());
+                patientRepository.save(patient.get());
+            } else {
+                throw new NotFoundException("The patient with the given id was not found!\n");
+            }
+        } else {
+            throw new NotFoundException("The prescription with the given id was not found!\n");
+        }
+    }
+
+    @Transactional
+    public List<Prescription> getPatientPrescriptionsList(Long patientId) {
+         Optional<Patient> existingPatient = patientRepository.findById(patientId);
+         if (existingPatient.isPresent()) {
+             return new ArrayList<>(existingPatient.get().getPrescriptions());
+         } else {
+             throw new NotFoundException("The patient with the given id does not exist!\n");
+         }
     }
 }
