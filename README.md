@@ -11,4 +11,4 @@ The MedREST API has the following features:
 - <b>sort</b> the data by a chosen field
 
 ## SQL Schema
-The SQL schema can be viewed at [here](https://drawsql.app/namio/diagrams/java-course-project#). 
+The sketch of my SQL schema can be viewed [here](https://drawsql.app/namio/diagrams/java-course-project#). 
